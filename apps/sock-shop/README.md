@@ -28,7 +28,7 @@ To get the url to the frontend:
 oc get route -n sock-shop front-end -o go-template='{{ .spec.host }}{{ println }}'
 ```
 
-Feel free to order socks. Deliveries not guaranteed! 
+Visit the URL and order socks for free. Deliveries not guaranteed! 
 
 
 
