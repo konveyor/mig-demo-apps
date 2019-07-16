@@ -1,0 +1,48 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: carts-db
+  labels:
+    name: carts-db
+  namespace: sock-shop
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: carts-db
+    spec:
+      serviceAccountName: sock-shop
+      containers:
+      - name: carts-db
+        image: mongo
+        ports:
+        - name: mongo
+          containerPort: 27017
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp-volume
+        - mountPath: /data/db
+          name: carts-data-volume
+      volumes:
+        - name: tmp-volume
+          emptyDir:
+            medium: Memory
+        - name: carts-data-volume
+          persistentVolumeClaim:
+            claimName: carts-data-volume-claim
+      nodeSelector:
+        beta.kubernetes.io/os: linux
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: carts-data-volume-claim
+  namespace: sock-shop
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
