@@ -31,6 +31,7 @@ users:
 - system:serviceaccount:robot-shop:robot-shop
 defaultAddCapabilities:
 - NET_ADMIN
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -68,6 +69,7 @@ spec:
             cpu: 100m
             memory: 50Mi
 
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -81,6 +83,7 @@ spec:
   selector:
     service: cart
 
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -118,6 +121,7 @@ spec:
             memory: 50Mi
       restartPolicy: Always
 
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -133,6 +137,7 @@ spec:
   selector:
     service: catalogue
 
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -169,8 +174,7 @@ spec:
             memory: 50Mi
       restartPolicy: Always
 
-# dispatch just listens to a message queue
-# it does not expose any ports
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -187,6 +191,7 @@ spec:
   selector:
     service: dispatch
 
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -221,6 +226,7 @@ spec:
           privileged: true
       restartPolicy: Always
 
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -236,6 +242,7 @@ spec:
   selector:
     service: mongodb
 
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -272,6 +279,7 @@ spec:
             memory: 400Mi
       restartPolicy: Always
 
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -287,6 +295,7 @@ spec:
   selector:
     service: mysql
 
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -327,6 +336,7 @@ spec:
           privileged: true
       restartPolicy: Always
 
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -342,6 +352,7 @@ spec:
   selector:
     service: payment
 
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -375,6 +386,7 @@ spec:
             memory: 256Mi
       restartPolicy: Always
 
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -396,6 +408,7 @@ spec:
   selector:
     service: rabbitmq
 
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -430,6 +443,7 @@ spec:
           privileged: true
       restartPolicy: Always
 
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -446,6 +460,7 @@ spec:
     service: ratings
 
 
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -478,6 +493,7 @@ spec:
             memory: 50Mi
       restartPolicy: Always
 
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -493,6 +509,7 @@ spec:
   selector:
     service: redis
 
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -526,6 +543,7 @@ spec:
             memory: 500Mi
       restartPolicy: Always
 
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -541,6 +559,7 @@ spec:
   selector:
     service: shipping
 
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -579,6 +598,7 @@ spec:
             memory: 50Mi
       restartPolicy: Always
 
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -594,6 +614,7 @@ spec:
   selector:
     service: user
 
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -644,6 +665,7 @@ spec:
 
 
 
+---
 apiVersion: v1
 kind: Service
 metadata:

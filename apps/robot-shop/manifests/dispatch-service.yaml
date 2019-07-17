@@ -1,5 +1,4 @@
-# dispatch just listens to a message queue
-# it does not expose any ports
+---
 apiVersion: v1
 kind: Service
 metadata:

@@ -35,7 +35,7 @@ After successful installation, the app should be exposed at a public facing URL.
 To get the url to the frontend:
 
 ```bash
-oc get route -n sock-shop front-end -o go-template='{{ .spec.host }}{{ println }}'
+oc get route -n robot-shop front-end -o go-template='{{ .spec.host }}{{ println }}'
 ```
 
 Visit the URL and order robots for free. Do not try to invade the world!
