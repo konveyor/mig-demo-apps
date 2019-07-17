@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Route
+metadata:
+  name: front-end
+  namespace: robot-shop
+spec:
+  path: "/"
+  port:
+    targetPort: http
+  to:
+    kind: Service
+    name: web
+
+

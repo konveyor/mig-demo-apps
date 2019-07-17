@@ -1,0 +1,662 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: robot-shop
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: robot-shop
+  namespace: robot-shop
+  labels:
+    component: robot-shop
+---
+kind: SecurityContextConstraints
+apiVersion: v1
+metadata:
+  name: robot-shop
+allowPrivilegedContainer: true
+runAsUser:
+  type: RunAsAny
+seLinuxContext:
+  type: RunAsAny
+supplementalGroups:
+  type: RunAsAny
+volumes:
+- '*'
+users:
+- system:admin
+- system:serviceaccount:robot-shop:robot-shop
+defaultAddCapabilities:
+- NET_ADMIN
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cart
+  labels:
+    service: cart
+  namespace: robot-shop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: cart
+  template:
+    metadata:
+      labels:
+        service: cart
+    spec:
+      serviceAccountName: robot-shop
+      containers:
+      - name: cart
+        image: robotshop/rs-cart:latest
+        # agent networking access 
+        env:
+          - name: INSTANA_AGENT_HOST
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: 200m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 50Mi
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: cart
+  namespace: robot-shop
+spec:
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+  selector:
+    service: cart
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalogue
+  labels:
+    service: catalogue
+  namespace: robot-shop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: catalogue
+  template:
+    metadata:
+      labels:
+        service: catalogue
+    spec:
+      serviceAccountName: robot-shop
+      containers:
+      - name: catalogue
+        image: robotshop/rs-catalogue:latest
+        env:
+          - name: INSTANA_AGENT_HOST
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: 200m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 50Mi
+      restartPolicy: Always
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: catalogue
+  name: catalogue
+  namespace: robot-shop
+spec:
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+  selector:
+    service: catalogue
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dispatch
+  labels:
+    service: dispatch
+  namespace: robot-shop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: dispatch
+  template:
+    metadata:
+      labels:
+        service: dispatch
+    spec:
+      serviceAccountName: robot-shop
+      containers:
+      - name: dispatch
+        image: robotshop/rs-dispatch:latest
+        env:
+          # agent networking access
+          - name: INSTANA_AGENT_HOST
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
+        resources:
+          limits:
+            cpu: 200m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 50Mi
+      restartPolicy: Always
+
+# dispatch just listens to a message queue
+# it does not expose any ports
+apiVersion: v1
+kind: Service
+metadata:
+  name: dispatch
+  labels:
+    service: dispatch
+  namespace: robot-shop
+spec:
+  clusterIP: None
+  ports:
+  - name: headless
+    port: 55555
+    targetPort: 0
+  selector:
+    service: dispatch
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb
+  labels:
+    service: mongodb
+  namespace: robot-shop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: mongodb
+  template:
+    metadata:
+      labels:
+        service: mongodb
+    spec:
+      serviceAccountName: robot-shop
+      containers:
+      - name: mongodb
+        image: robotshop/rs-mongodb:latest
+        ports:
+        - containerPort: 27017
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        securityContext:
+          privileged: true
+      restartPolicy: Always
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: mongodb
+  name: mongodb
+  namespace: robot-shop
+spec:
+  ports:
+  - name: mongo
+    port: 27017
+    targetPort: 27017
+  selector:
+    service: mongodb
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  labels:
+    service: mysql
+  namespace: robot-shop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: mysql
+  template:
+    metadata:
+      labels:
+        service: mysql
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccountName: robot-shop
+      containers:
+      - name: mysql
+        image: robotshop/rs-mysql-db:latest
+        ports:
+        - containerPort: 3306
+        securityContext:
+          privileged: true
+        resources:
+          limits:
+            cpu: 200m
+            memory: 800Mi
+          requests:
+            cpu: 100m
+            memory: 400Mi
+      restartPolicy: Always
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: mysql
+  name: mysql
+  namespace: robot-shop
+spec:
+  ports:
+  - name: mysql
+    port: 3306
+    targetPort: 3306
+  selector:
+    service: mysql
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment
+  labels:
+    service: payment
+  namespace: robot-shop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: payment
+  template:
+    metadata:
+      labels:
+        service: payment
+    spec:
+      serviceAccountName: robot-shop
+      containers:
+      - name: payment
+        image: robotshop/rs-payment:latest
+        # agent networking access
+        env:
+          - name: INSTANA_AGENT_HOST
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: 200m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 50Mi
+        securityContext:
+          privileged: true
+      restartPolicy: Always
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment
+  labels:
+    service: payment
+  namespace: robot-shop
+spec:
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+  selector:
+    service: payment
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+  labels:
+    service: rabbitmq
+  namespace: robot-shop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: rabbitmq
+  template:
+    metadata:
+      labels:
+        service: rabbitmq
+    spec:
+      serviceAccountName: robot-shop
+      containers:
+      - name: rabbitmq
+        image: rabbitmq:3.7-management-alpine
+        ports:
+        - containerPort: 5672
+        - containerPort: 15672
+        resources:
+          limits:
+            cpu: 200m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+      restartPolicy: Always
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  labels:
+    service: rabbitmq
+  namespace: robot-shop
+spec:
+  ports:
+  - name: tcp-amqp
+    port: 5672
+    targetPort: 5672
+  - name: http-management
+    port: 15672
+    targetPort: 15672
+  - name: tcp-epmd
+    port: 4369
+    targetPort: 4369
+  selector:
+    service: rabbitmq
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ratings
+  labels:
+    service: ratings
+  namespace: robot-shop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: ratings
+  template:
+    metadata:
+      labels:
+        service: ratings
+    spec:
+      serviceAccountName: robot-shop
+      containers:
+      - name: ratings
+        image: robotshop/rs-ratings:latest
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: 200m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 50Mi
+        securityContext:
+          privileged: true
+      restartPolicy: Always
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: ratings
+  labels:
+    service: ratings
+  namespace: robot-shop
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+  selector:
+    service: ratings
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: redis
+  name: redis
+  namespace: robot-shop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: redis
+  template:
+    metadata:
+      labels:
+        service: redis
+    spec:
+      serviceAccountName: robot-shop
+      containers:
+      - name: redis
+        image: redis:4.0.6
+        ports:
+        - containerPort: 6379
+        resources:
+          limits:
+            cpu: 200m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 50Mi
+      restartPolicy: Always
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: redis
+  name: redis
+  namespace: robot-shop
+spec:
+  ports:
+  - name: redis
+    port: 6379
+    targetPort: 6379
+  selector:
+    service: redis
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shipping
+  labels:
+    service: shipping
+  namespace: robot-shop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: shipping
+  template:
+    metadata:
+      labels:
+        service: shipping
+    spec:
+      serviceAccountName: robot-shop
+      containers:
+      - name: shipping
+        image: robotshop/rs-shipping:latest
+        ports:
+        - containerPort: 8080
+        # it's Java it needs lots of memory
+        resources:
+          limits:
+            cpu: 200m
+            memory: 1000Mi
+          requests:
+            cpu: 100m
+            memory: 500Mi
+      restartPolicy: Always
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: shipping
+  labels:
+    service: shipping
+  namespace: robot-shop
+spec:
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+  selector:
+    service: shipping
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user
+  labels:
+    service: user
+  namespace: robot-shop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: user
+  template:
+    metadata:
+      labels:
+        service: user
+    spec:
+      serviceAccountName: robot-shop
+      containers:
+      - name: user
+        image: robotshop/rs-user:latest
+        env:
+          # agent networking access
+          - name: INSTANA_AGENT_HOST
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: 200m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 50Mi
+      restartPolicy: Always
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: user
+  labels:
+    service: user
+  namespace: robot-shop
+spec:
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+  selector:
+    service: user
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  labels:
+    service: web
+  namespace: robot-shop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: web
+  template:
+    metadata:
+      labels:
+        service: web
+    spec:
+      serviceAccountName: robot-shop
+      containers:
+      - name: web
+        image: robotshop/rs-web:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: 200m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 50Mi
+        securityContext:
+          privileged: true
+      restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Route
+metadata:
+  name: front-end
+  namespace: robot-shop
+spec:
+  path: "/"
+  port:
+    targetPort: http
+  to:
+    kind: Service
+    name: web
+
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  labels:
+    service: web
+  namespace: robot-shop
+spec:
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+  selector:
+    service: web
+  type: LoadBalancer
+

@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  labels:
+    service: mysql
+  namespace: robot-shop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: mysql
+  template:
+    metadata:
+      labels:
+        service: mysql
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccountName: robot-shop
+      containers:
+      - name: mysql
+        image: robotshop/rs-mysql-db:latest
+        ports:
+        - containerPort: 3306
+        securityContext:
+          privileged: true
+        resources:
+          limits:
+            cpu: 200m
+            memory: 800Mi
+          requests:
+            cpu: 100m
+            memory: 400Mi
+      restartPolicy: Always
