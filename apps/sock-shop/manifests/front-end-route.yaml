@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Route
 metadata:
-  name: sock-shop
+  name: front-end
   namespace: sock-shop
 spec:
   path: "/" 
