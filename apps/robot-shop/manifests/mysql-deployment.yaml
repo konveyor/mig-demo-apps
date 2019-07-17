@@ -24,8 +24,6 @@ spec:
         image: robotshop/rs-mysql-db:latest
         ports:
         - containerPort: 3306
-        securityContext:
-          privileged: true
         resources:
           limits:
             cpu: 200m
@@ -33,4 +31,25 @@ spec:
           requests:
             cpu: 100m
             memory: 400Mi
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: "/var/lib/mysql/data"
+          name: mysql-data-volume
       restartPolicy: Always
+      volumes:
+      - name: mysql-data-volume
+        persistentVolumeClaim:
+          claimName: mysql-data-volume-claim
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-data-volume-claim
+  namespace: robot-shop
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi

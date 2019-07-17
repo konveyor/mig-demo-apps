@@ -4,16 +4,20 @@ apiVersion: v1
 metadata:
   name: robot-shop
 allowPrivilegedContainer: true
+readOnlyRootFilesystem: false
+allowPrivilegeEscalation: true
+fsGroup:
+  type: RunAsAny
 runAsUser:
   type: RunAsAny
 seLinuxContext:
-  type: RunAsAny
+  type: MustRunAs
 supplementalGroups:
   type: RunAsAny
+requiredDropCapabilities:
+- MKNOD
 volumes:
 - '*'
 users:
 - system:admin
 - system:serviceaccount:robot-shop:robot-shop
-defaultAddCapabilities:
-- NET_ADMIN

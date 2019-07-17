@@ -29,4 +29,23 @@ spec:
           requests:
             cpu: 100m
             memory: 50Mi
+        volumeMounts:
+        - mountPath: "/data"
+          name: redis-volume
       restartPolicy: Always
+      volumes:
+      - name: redis-volume
+        persistentVolumeClaim:
+          claimName: redis-volume-claim
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: robot-shop
+  name: redis-volume-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi

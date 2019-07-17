@@ -22,6 +22,9 @@ spec:
         image: robotshop/rs-mongodb:latest
         ports:
         - containerPort: 27017
+        volumeMounts:
+        - mountPath: "/data/db"
+          name: mongodb-volume
         resources:
           limits:
             cpu: 200m
@@ -29,6 +32,20 @@ spec:
           requests:
             cpu: 100m
             memory: 100Mi
-        securityContext:
-          privileged: true
       restartPolicy: Always
+      volumes:
+      - name: mongodb-volume
+        persistentVolumeClaim:
+          claimName: mongodb-volume-claim
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongodb-volume-claim
+  namespace: robot-shop
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
