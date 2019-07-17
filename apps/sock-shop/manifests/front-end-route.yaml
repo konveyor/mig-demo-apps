@@ -10,4 +10,4 @@ spec:
     targetPort: 8079
   to:
     kind: Service
-    name: sock-shop
+    name: front-end
