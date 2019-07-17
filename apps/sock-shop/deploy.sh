@@ -1,3 +1,3 @@
 #!/bin/bash
 
-oc create -f manifests/
+oc create -f manifest.yaml

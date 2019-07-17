@@ -6,17 +6,27 @@ An e-commerce website that sells socks.
 
 Login to your openshift cluster. 
 
-To install:
+To deploy:
 
 ```bash
 ./deploy.sh
 ```
 
-To uninstall:
+To remove:
 
 ```bash
 ./destroy.sh
 ```
+
+`manifest.yml` is a collection of resources in `manifests` directory. 
+
+You may edit individual YAMLs for different app resources. To create an updated `manifest.yml` after updating resource definitions :
+
+```bash
+./build.sh
+```
+
+This will combine all YAMLs and create an updated `manifest.yaml`.
 
 ## Usage
 

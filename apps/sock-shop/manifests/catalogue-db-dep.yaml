@@ -1,39 +1,68 @@
 ---
-apiVersion: extensions/v1beta1
-kind: Deployment
+apiVersion: v1
+kind: DeploymentConfig
 metadata:
+  annotations:
+    template.alpha.openshift.io/wait-for-ready: 'true'
   name: catalogue-db
-  labels:
-    name: catalogue-db
   namespace: sock-shop
 spec:
   replicas: 1
+  selector:
+    name: catalogue-db
+  strategy:
+    type: Recreate
+    rollingParams:
+      post:
+        execNewPod:
+          command:
+          - /bin/sh
+          - -c
+          - hostname && sleep 10 && /opt/rh/rh-mysql57/root/usr/bin/mysql -u $MYSQL_USER -D $MYSQL_DATABASE -p$MYSQL_PASSWORD -P 3306 < /mysql-init/dump.sql
   template:
     metadata:
       labels:
         name: catalogue-db
     spec:
-      serviceAccountName: sock-shop
       containers:
-      - name: catalogue-db
-        image: weaveworksdemos/catalogue-db:0.3.0
-        env:
-          - name: MYSQL_ROOT_PASSWORD
-            value: fake_password
-          - name: MYSQL_DATABASE
-            value: socksdb
+      - env:
+        - name: MYSQL_USER
+          value: catalogue_user
+        - name: MYSQL_PASSWORD
+          value: default_password
+        - name: MYSQL_DATABASE
+          value: socksdb
+        image: " "
+        imagepullpolicy: always
+        name: catalogue-db
         ports:
-        - name: mysql
-          containerPort: 3306
+        - containerPort: 3306
+        resources:
+          limits:
+            memory: 512Mi
         volumeMounts:
-        - mountPath: /var/lib/mysql
-          name: catalogue-data-volume
+        - mountPath: "/var/lib/mysql/data"
+          name: catalogue-db-data-volume
+        - mountPath: "/mysql-init"
+          name: catalogue-db-init-volume
       volumes:
-        - name: catalogue-data-volume
-          persistentVolumeClaim:
-            claimName: catalogue-data-volume-claim
-      nodeSelector:
-        beta.kubernetes.io/os: linux
+      - name: catalogue-db-data-volume
+        persistentVolumeClaim:
+          claimName: catalogue-data-volume-claim
+      - name: catalogue-db-init-volume
+        configMap:
+          name: catalogue-db-config
+  triggers:
+  - imageChangeParams:
+      automatic: true
+      containerNames:
+      - catalogue-db
+      from:
+        kind: ImageStreamTag
+        name: mysql:5.7
+        namespace: openshift
+    type: ImageChange
+  - type: ConfigChange
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -46,3 +75,4 @@ spec:
   resources:
     requests:
       storage: 10Gi
+

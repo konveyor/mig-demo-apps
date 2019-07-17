@@ -1,3 +1,3 @@
 #!/bin/bash
 
-oc delete -f manifests/
+oc delete -f manifest.yaml
