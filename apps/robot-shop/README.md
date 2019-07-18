@@ -30,7 +30,7 @@ This will combine all YAMLs and create an updated `manifest.yaml`.
 
 ## Usage
 
-After successful installation, the app should be exposed at a public facing URL. Wait for 4-5 minutes to services to start.
+After successful installation, the app should be exposed at a public facing URL. Wait for 4-5 minutes for all the services to start.
 
 To get the url to the frontend:
 
@@ -38,7 +38,7 @@ To get the url to the frontend:
 oc get route -n robot-shop front-end -o go-template='{{ .spec.host }}{{ println }}'
 ```
 
-Visit the URL and order robots for free. Do not try to invade the world!
+Visit the URL and order robots for free. These robots are terrible. Don't use them to invade the world!
 
 
 
