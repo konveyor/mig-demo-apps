@@ -1,0 +1,39 @@
+---
+kind: BuildConfig
+apiVersion: v1
+metadata:
+  name: restify
+  namespace: parks-app
+  labels:
+    app: restify
+spec:
+  triggers:
+  - type: GitHub
+    github:
+      secret: 4Xwu0tyAab90aaoasd88qweAasdaqvjknfrl3qwpo
+  - type: Generic
+    generic:
+      secret: 4Xwu0tyAab90aaoasd88qweAasdaqvjknfrl3qwpo
+  - type: ConfigChange
+  - type: ImageChange
+    imageChange: {}
+  source:
+    type: Git
+    git:
+      uri: https://github.com/ryanj/restify-mongodb-parks
+      ref: master
+  strategy:
+    type: Source
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        namespace: openshift
+        name: nodejs:0.10
+  output:
+    to:
+      kind: ImageStreamTag
+      name: "restify:latest"
+  resources: {}
+status:
+  lastVersion: 0
+

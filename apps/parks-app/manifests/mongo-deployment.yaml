@@ -1,0 +1,52 @@
+---
+kind: DeploymentConfig
+apiVersion: v1
+metadata:
+  name: mongodb
+  namespace: parks-app
+spec:
+  strategy:
+    type: Recreate
+  triggers:
+  - type: ImageChange
+    imageChangeParams:
+      automatic: true
+      containerNames:
+      - mongodb-container
+      from:
+        kind: ImageStreamTag
+        name: mongodb:latest
+        namespace: openshift
+  - type: ConfigChange
+  replicas: 1
+  selector:
+    name: mongodb
+  template:
+    metadata:
+      labels:
+        name: mongodb
+    spec:
+      containers:
+      - name: mongodb-container
+        image: " "
+        ports:
+        - containerPort: 27017
+          protocol: TCP
+        env:
+        - name: MONGODB_USER
+          value: mongo-user-1
+        - name: MONGODB_PASSWORD
+          value: mongo-user-password
+        - name: MONGODB_DATABASE
+          value: restify-database
+        - name: MONGODB_ADMIN_PASSWORD
+          value: moogo-admin-pass
+        volumeMounts:
+        - name: mongodb-data
+          mountPath: /data/db"
+        imagePullPolicy: Always
+      volumes:
+      - name: mongodb-data
+        persistentVolumeClaim:
+          claimName: mongodb-data-claim
+      restartPolicy: Always

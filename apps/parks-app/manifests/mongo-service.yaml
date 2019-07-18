@@ -1,0 +1,20 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: mongodb
+  namespace: parks-app
+spec:
+  ports:
+  - name: mongo
+    protocol: TCP
+    port: 27017
+    targetPort: 27017
+    nodePort: 0
+  selector:
+    name: mongodb
+  portalIP: ''
+  type: ClusterIP
+  sessionAffinity: None
+status:
+  loadBalancer: {}
