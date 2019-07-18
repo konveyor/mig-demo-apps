@@ -157,31 +157,28 @@ metadata:
 spec:
   strategy:
     type: Recreate
-    resources: {}
   triggers:
   - type: ImageChange
     imageChangeParams:
-      automatic: false
+      automatic: true
       containerNames:
-      - mongodb
+      - mongodb-container
       from:
         kind: ImageStreamTag
         name: mongodb:latest
         namespace: openshift
-      lastTriggeredImage: ''
   - type: ConfigChange
   replicas: 1
   selector:
     name: mongodb
   template:
     metadata:
-      creationTimestamp: 
       labels:
         name: mongodb
     spec:
       containers:
-      - name: mongodb
-        image: mongodb
+      - name: mongodb-container
+        image: " "
         ports:
         - containerPort: 27017
           protocol: TCP
@@ -194,23 +191,15 @@ spec:
           value: restify-database
         - name: MONGODB_ADMIN_PASSWORD
           value: moogo-admin-pass
-        resources: {}
         volumeMounts:
-        - name: "mongodb-data"
-          mountPath: "/var/lib/mongodb/data"
-        terminationMessagePath: "/dev/termination-log"
-        imagePullPolicy: IfNotPresent
-        capabilities: {}
-        securityContext:
-          capabilities: {}
-          privileged: false
+        - name: mongodb-data
+          mountPath: /data/db"
+        imagePullPolicy: Always
       volumes:
-      - name: "mongodb-data"
+      - name: mongodb-data
         persistentVolumeClaim:
-          claimName: "mongodb-data-claim"
+          claimName: mongodb-data-claim
       restartPolicy: Always
-      dnsPolicy: ClusterFirst
-status: {}
 
 ---
 kind: Service
