@@ -18,21 +18,23 @@ apiVersion: v1
 metadata:
   name: robot-shop
 allowPrivilegedContainer: true
+readOnlyRootFilesystem: false
+allowPrivilegeEscalation: true
+fsGroup:
+  type: RunAsAny
 runAsUser:
   type: RunAsAny
 seLinuxContext:
-  type: RunAsAny
+  type: MustRunAs
 supplementalGroups:
   type: RunAsAny
+requiredDropCapabilities:
+- MKNOD
 volumes:
 - '*'
 users:
 - system:admin
 - system:serviceaccount:robot-shop:robot-shop
-defaultAddCapabilities:
-- NET_ADMIN
-- CHOWN
-- SETGUID
 
 ---
 apiVersion: apps/v1
@@ -290,8 +292,6 @@ spec:
         image: robotshop/rs-mysql-db:latest
         ports:
         - containerPort: 3306
-        securityContext:
-          privileged: true
         resources:
           limits:
             cpu: 200m
@@ -299,7 +299,28 @@ spec:
           requests:
             cpu: 100m
             memory: 400Mi
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: "/var/lib/mysql/data"
+          name: mysql-data-volume
       restartPolicy: Always
+      volumes:
+      - name: mysql-data-volume
+        persistentVolumeClaim:
+          claimName: mysql-data-volume-claim
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-data-volume-claim
+  namespace: robot-shop
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
 
 ---
 apiVersion: v1
@@ -513,7 +534,26 @@ spec:
           requests:
             cpu: 100m
             memory: 50Mi
+        volumeMounts:
+        - mountPath: "/data"
+          name: redis-volume
       restartPolicy: Always
+      volumes:
+      - name: redis-volume
+        persistentVolumeClaim:
+          claimName: redis-volume-claim
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: robot-shop
+  name: redis-volume-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
 
 ---
 apiVersion: v1
