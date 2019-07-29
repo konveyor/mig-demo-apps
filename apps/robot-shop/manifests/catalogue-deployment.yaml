@@ -16,7 +16,6 @@ spec:
       labels:
         service: catalogue
     spec:
-      serviceAccountName: robot-shop
       containers:
       - name: catalogue
         image: robotshop/rs-catalogue:latest

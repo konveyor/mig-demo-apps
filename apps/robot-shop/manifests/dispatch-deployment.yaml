@@ -16,7 +16,6 @@ spec:
       labels:
         service: dispatch
     spec:
-      serviceAccountName: robot-shop
       containers:
       - name: dispatch
         image: robotshop/rs-dispatch:latest

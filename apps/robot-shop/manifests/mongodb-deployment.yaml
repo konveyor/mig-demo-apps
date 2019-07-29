@@ -16,7 +16,6 @@ spec:
       labels:
         service: mongodb
     spec:
-      serviceAccountName: robot-shop
       containers:
       - name: mongodb
         image: robotshop/rs-mongodb:latest
@@ -32,8 +31,6 @@ spec:
           requests:
             cpu: 100m
             memory: 100Mi
-        securityContext:
-          privileged: true
       restartPolicy: Always
       volumes:
       - name: mongodb-volume

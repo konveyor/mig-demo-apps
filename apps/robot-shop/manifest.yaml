@@ -1,41 +1,8 @@
 ---
-apiVersion: v1
 kind: Namespace
-metadata:
-  name: robot-shop
-
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: robot-shop
-  namespace: robot-shop
-  labels:
-    component: robot-shop
----
-kind: SecurityContextConstraints
 apiVersion: v1
 metadata:
   name: robot-shop
-allowPrivilegedContainer: true
-readOnlyRootFilesystem: false
-allowPrivilegeEscalation: true
-fsGroup:
-  type: RunAsAny
-runAsUser:
-  type: RunAsAny
-seLinuxContext:
-  type: MustRunAs
-supplementalGroups:
-  type: RunAsAny
-requiredDropCapabilities:
-- MKNOD
-volumes:
-- '*'
-users:
-- system:admin
-- system:serviceaccount:robot-shop:robot-shop
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -54,7 +21,6 @@ spec:
       labels:
         service: cart
     spec:
-      serviceAccountName: robot-shop
       containers:
       - name: cart
         image: robotshop/rs-cart:latest
@@ -106,7 +72,6 @@ spec:
       labels:
         service: catalogue
     spec:
-      serviceAccountName: robot-shop
       containers:
       - name: catalogue
         image: robotshop/rs-catalogue:latest
@@ -160,7 +125,6 @@ spec:
       labels:
         service: dispatch
     spec:
-      serviceAccountName: robot-shop
       containers:
       - name: dispatch
         image: robotshop/rs-dispatch:latest
@@ -214,7 +178,6 @@ spec:
       labels:
         service: mongodb
     spec:
-      serviceAccountName: robot-shop
       containers:
       - name: mongodb
         image: robotshop/rs-mongodb:latest
@@ -230,8 +193,6 @@ spec:
           requests:
             cpu: 100m
             memory: 100Mi
-        securityContext:
-          privileged: true
       restartPolicy: Always
       volumes:
       - name: mongodb-volume
@@ -267,18 +228,37 @@ spec:
     service: mongodb
 
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: DeploymentConfig
 metadata:
   name: mysql
-  labels:
-    service: mysql
+#  labels:
+#    service: mysql
   namespace: robot-shop
 spec:
   replicas: 1
   selector:
-    matchLabels:
-      service: mysql
+    service: mysql
+  strategy:
+    type: Recreate
+    recreateParams:
+      post:
+        failurePolicy: ignore
+        execNewPod:
+          containerName: mysql
+          volumes:
+            - mysql-scripts-volume
+          command:
+          - /bin/sh
+          - -c
+          - sleep 120 && zcat /tmp/mysql-init-scripts/10-dump.sql.gz | /opt/rh/rh-mysql57/root/bin/mysql -h $MYSQL_SERVICE_HOST -u root -pR00t@123 -D $MYSQL_DATABASE -P 3306 && /opt/rh/rh-mysql57/root/bin/mysql -h $MYSQL_SERVICE_HOST -u root -pR00t@123 -P 3306 < /tmp/mysql-init-scripts/20-ratings.sql && sleep 60
+          env:
+          - name: MYSQL_USER
+            value: shipping
+          - name: MYSQL_PASSWORD
+            value: secret
+          - name: MYSQL_DATABASE
+            value: cities
   template:
     metadata:
       labels:
@@ -286,12 +266,31 @@ spec:
       annotations:
         sidecar.istio.io/inject: "false"
     spec:
-      serviceAccountName: robot-shop
       containers:
+      - name: post-hook
+        imagePullPolicy: Always
+        image: docker.io/pranavgaikwad/robot-shop-mysql-post-hook:latest
+        command:
+        - /bin/sh
+        - -c
+        - cp -r /tmp/post-scripts/* /tmp/mysql-init-scripts/ && sleep infinity
+        volumeMounts:
+        - mountPath: "/tmp/mysql-init-scripts/"
+          name: mysql-scripts-volume
       - name: mysql
-        image: robotshop/rs-mysql-db:latest
+        image: " "
+        imagePullPolicy: Always
         ports:
         - containerPort: 3306
+        env:
+        - name: MYSQL_USER
+          value: shipping
+        - name: MYSQL_PASSWORD
+          value: secret
+        - name: MYSQL_DATABASE
+          value: cities
+        - name: MYSQL_ROOT_PASSWORD
+          value: R00t@123
         resources:
           limits:
             cpu: 200m
@@ -299,21 +298,47 @@ spec:
           requests:
             cpu: 100m
             memory: 400Mi
-        securityContext:
-          privileged: true
         volumeMounts:
         - mountPath: "/var/lib/mysql/data"
           name: mysql-data-volume
+        - mountPath: "/tmp/mysql-init-scripts"
+          name: mysql-scripts-volume      
       restartPolicy: Always
       volumes:
       - name: mysql-data-volume
         persistentVolumeClaim:
           claimName: mysql-data-volume-claim
+      - name: mysql-scripts-volume
+        persistentVolumeClaim:
+          claimName: mysql-scripts-volume-claim
+  triggers:
+  - imageChangeParams:
+      automatic: true
+      containerNames:
+      - mysql
+      from:
+        kind: ImageStreamTag
+        name: mysql:5.7
+        namespace: openshift
+    type: ImageChange
+  - type: ConfigChange
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mysql-data-volume-claim
+  namespace: robot-shop
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-scripts-volume-claim
   namespace: robot-shop
 spec:
   accessModes:
@@ -339,6 +364,25 @@ spec:
     service: mysql
 
 ---
+apiVersion: v1
+data:
+  payment.ini: |
+    [uwsgi]
+    wsgi-file = payment.py
+    callable = app
+
+    master = true
+    processes = 1
+    lazy-apps = true
+    enable-threads = true
+
+    socket = 0.0.0.0:8080
+    protocol = http
+kind: ConfigMap
+metadata:
+  name: payment-config
+  namespace: robot-shop
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -356,7 +400,6 @@ spec:
       labels:
         service: payment
     spec:
-      serviceAccountName: robot-shop
       containers:
       - name: payment
         image: robotshop/rs-payment:latest
@@ -375,9 +418,14 @@ spec:
           requests:
             cpu: 100m
             memory: 50Mi
-        securityContext:
-          privileged: true
+        volumeMounts:
+        - mountPath: /app
+          name: payment-config-volume
       restartPolicy: Always
+      volumes:
+      - name: payment-config-volume
+        configMap:
+          name: payment-config
 
 ---
 apiVersion: v1
@@ -469,12 +517,16 @@ spec:
       labels:
         service: ratings
     spec:
-      serviceAccountName: robot-shop
       containers:
-      - name: ratings
-        image: robotshop/rs-ratings:latest
+      - name: php-fpm
+        image: php:7.0-fpm
+        imagePullPolicy: Always
         ports:
-        - containerPort: 80
+        - containerPort: 9000
+      - name: ratings
+        image: docker.io/pranavgaikwad/robot-shop-ratings:latest
+        ports:
+        - containerPort: 8080
         resources:
           limits:
             cpu: 200m
@@ -482,8 +534,6 @@ spec:
           requests:
             cpu: 100m
             memory: 50Mi
-        securityContext:
-          privileged: true
       restartPolicy: Always
 
 ---
@@ -521,7 +571,6 @@ spec:
       labels:
         service: redis
     spec:
-      serviceAccountName: robot-shop
       containers:
       - name: redis
         image: redis:4.0.6
@@ -589,7 +638,6 @@ spec:
       labels:
         service: shipping
     spec:
-      serviceAccountName: robot-shop
       containers:
       - name: shipping
         image: robotshop/rs-shipping:latest
@@ -639,7 +687,6 @@ spec:
       labels:
         service: user
     spec:
-      serviceAccountName: robot-shop
       containers:
       - name: user
         image: robotshop/rs-user:latest
@@ -694,10 +741,9 @@ spec:
       labels:
         service: web
     spec:
-      serviceAccountName: robot-shop
       containers:
       - name: web
-        image: robotshop/rs-web:latest
+        image: docker.io/pranavgaikwad/robot-shop-nginx:latest
         ports:
         - containerPort: 8080
         resources:
@@ -707,8 +753,8 @@ spec:
           requests:
             cpu: 100m
             memory: 50Mi
-        securityContext:
-          privileged: true
+        # securityContext:
+        #   privileged: true
       restartPolicy: Always
 
 ---

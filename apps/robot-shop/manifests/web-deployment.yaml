@@ -16,10 +16,9 @@ spec:
       labels:
         service: web
     spec:
-      serviceAccountName: robot-shop
       containers:
       - name: web
-        image: robotshop/rs-web:latest
+        image: docker.io/pranavgaikwad/robot-shop-nginx:latest
         ports:
         - containerPort: 8080
         resources:
@@ -29,6 +28,6 @@ spec:
           requests:
             cpu: 100m
             memory: 50Mi
-        securityContext:
-          privileged: true
+        # securityContext:
+        #   privileged: true
       restartPolicy: Always

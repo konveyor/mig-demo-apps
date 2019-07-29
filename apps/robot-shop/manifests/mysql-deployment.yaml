@@ -1,16 +1,35 @@
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: DeploymentConfig
 metadata:
   name: mysql
-  labels:
-    service: mysql
+#  labels:
+#    service: mysql
   namespace: robot-shop
 spec:
   replicas: 1
   selector:
-    matchLabels:
-      service: mysql
+    service: mysql
+  strategy:
+    type: Recreate
+    recreateParams:
+      post:
+        failurePolicy: ignore
+        execNewPod:
+          containerName: mysql
+          volumes:
+            - mysql-scripts-volume
+          command:
+          - /bin/sh
+          - -c
+          - sleep 120 && zcat /tmp/mysql-init-scripts/10-dump.sql.gz | /opt/rh/rh-mysql57/root/bin/mysql -h $MYSQL_SERVICE_HOST -u root -pR00t@123 -D $MYSQL_DATABASE -P 3306 && /opt/rh/rh-mysql57/root/bin/mysql -h $MYSQL_SERVICE_HOST -u root -pR00t@123 -P 3306 < /tmp/mysql-init-scripts/20-ratings.sql && sleep 60
+          env:
+          - name: MYSQL_USER
+            value: shipping
+          - name: MYSQL_PASSWORD
+            value: secret
+          - name: MYSQL_DATABASE
+            value: cities
   template:
     metadata:
       labels:
@@ -18,12 +37,31 @@ spec:
       annotations:
         sidecar.istio.io/inject: "false"
     spec:
-      serviceAccountName: robot-shop
       containers:
+      - name: post-hook
+        imagePullPolicy: Always
+        image: docker.io/pranavgaikwad/robot-shop-mysql-post-hook:latest
+        command:
+        - /bin/sh
+        - -c
+        - cp -r /tmp/post-scripts/* /tmp/mysql-init-scripts/ && sleep infinity
+        volumeMounts:
+        - mountPath: "/tmp/mysql-init-scripts/"
+          name: mysql-scripts-volume
       - name: mysql
-        image: robotshop/rs-mysql-db:latest
+        image: " "
+        imagePullPolicy: Always
         ports:
         - containerPort: 3306
+        env:
+        - name: MYSQL_USER
+          value: shipping
+        - name: MYSQL_PASSWORD
+          value: secret
+        - name: MYSQL_DATABASE
+          value: cities
+        - name: MYSQL_ROOT_PASSWORD
+          value: R00t@123
         resources:
           limits:
             cpu: 200m
@@ -31,21 +69,47 @@ spec:
           requests:
             cpu: 100m
             memory: 400Mi
-        securityContext:
-          privileged: true
         volumeMounts:
         - mountPath: "/var/lib/mysql/data"
           name: mysql-data-volume
+        - mountPath: "/tmp/mysql-init-scripts"
+          name: mysql-scripts-volume      
       restartPolicy: Always
       volumes:
       - name: mysql-data-volume
         persistentVolumeClaim:
           claimName: mysql-data-volume-claim
+      - name: mysql-scripts-volume
+        persistentVolumeClaim:
+          claimName: mysql-scripts-volume-claim
+  triggers:
+  - imageChangeParams:
+      automatic: true
+      containerNames:
+      - mysql
+      from:
+        kind: ImageStreamTag
+        name: mysql:5.7
+        namespace: openshift
+    type: ImageChange
+  - type: ConfigChange
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mysql-data-volume-claim
+  namespace: robot-shop
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-scripts-volume-claim
   namespace: robot-shop
 spec:
   accessModes:
