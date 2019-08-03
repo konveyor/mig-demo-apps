@@ -14,15 +14,7 @@ Based on Bitnami nginx, this image is a reverse proxy for all services running i
 
 ### ratings
 
-This is a collection of two images which run the ratings service on Robot Shop. 
-
-#### ratings [php]
-
-Based on Bitnami php-fpm, this image serves the PHP service for ratings.
-
-#### ratings [nginx]
-
-Based on Bitnami nginx, this image is a reverse proxy for PHP fpm backend.
+This is modified image with Apache2 server running on 8080 port.
 
 ## Building images
 
