@@ -17,15 +17,10 @@ spec:
         service: ratings
     spec:
       containers:
-      - name: php-fpm
-        image: php:7.0-fpm
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 9000
       - name: ratings
         image: docker.io/pranavgaikwad/robot-shop-ratings:latest
         ports:
-        - containerPort: 8080
+        - containerPort: 80
         resources:
           limits:
             cpu: 200m

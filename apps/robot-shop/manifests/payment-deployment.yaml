@@ -1,23 +1,4 @@
 ---
-apiVersion: v1
-data:
-  payment.ini: |
-    [uwsgi]
-    wsgi-file = payment.py
-    callable = app
-
-    master = true
-    processes = 1
-    lazy-apps = true
-    enable-threads = true
-
-    socket = 0.0.0.0:8080
-    protocol = http
-kind: ConfigMap
-metadata:
-  name: payment-config
-  namespace: robot-shop
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -37,7 +18,7 @@ spec:
     spec:
       containers:
       - name: payment
-        image: robotshop/rs-payment:latest
+        image: docker.io/pranavgaikwad/robot-shop-payment:latest
         # agent networking access
         env:
           - name: INSTANA_AGENT_HOST
@@ -53,11 +34,4 @@ spec:
           requests:
             cpu: 100m
             memory: 50Mi
-        volumeMounts:
-        - mountPath: /app
-          name: payment-config-volume
       restartPolicy: Always
-      volumes:
-      - name: payment-config-volume
-        configMap:
-          name: payment-config
