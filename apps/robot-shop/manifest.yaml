@@ -520,7 +520,6 @@ spec:
   selector:
     service: ratings
 
-
 ---
 apiVersion: apps/v1
 kind: Deployment
