@@ -251,7 +251,7 @@ spec:
           command:
           - /bin/sh
           - -c
-          - sleep 120 && zcat /tmp/mysql-init-scripts/10-dump.sql.gz | /opt/rh/rh-mysql57/root/bin/mysql -h $MYSQL_SERVICE_HOST -u root -pR00t@123 -D $MYSQL_DATABASE -P 3306 && /opt/rh/rh-mysql57/root/bin/mysql -h $MYSQL_SERVICE_HOST -u root -pR00t@123 -P 3306 < /tmp/mysql-init-scripts/20-ratings.sql && sleep 60
+          - sleep 120 && zcat /tmp/mysql-init-scripts/10-dump.sql.gz | /opt/rh/rh-mysql57/root/bin/mysql --force -h $MYSQL_SERVICE_HOST -u root -pR00t@123 -D $MYSQL_DATABASE -P 3306 && /opt/rh/rh-mysql57/root/bin/mysql -h $MYSQL_SERVICE_HOST -u root -pR00t@123 -P 3306 < /tmp/mysql-init-scripts/20-ratings.sql && sleep 60
           env:
           - name: MYSQL_USER
             value: shipping
