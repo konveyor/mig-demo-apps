@@ -4,7 +4,7 @@ A simple app to visualize locations of popular Historic Sites and National Parks
 
 ## Installation
 
-Login to your openshift cluster. 
+Login to your OpenShift cluster. 
 
 To deploy:
 
@@ -30,7 +30,7 @@ This will combine all YAMLs and create an updated `manifest.yaml`.
 
 ## Usage
 
-After successful installation, the app should be exposed at a public facing URL. Wait for 4-5 minutes for all the services to start.
+After successful installation, the app should be exposed at a public URL. Wait for 4-5 minutes for all the services to start.
 
 To get the url to the frontend:
 
@@ -38,5 +38,4 @@ To get the url to the frontend:
 oc get route -n parks-app restify -o go-template='{{ .spec.host }}{{ println }}'
 ```
 
-
-
+If you read everything carefully, here's a cookie for you 🍪
