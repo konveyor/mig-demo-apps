@@ -25,5 +25,5 @@ After successful installation, the app should be exposed at a public URL. Wait f
 To get the url to the frontend:
 
 ```bash
-oc get route -n mssql-persistent mssql -o go-template='{{ .spec.host }}{{ println }}'
+oc get route -n mssql-example mssql-app-route -o go-template='{{ .spec.host }}{{ println }}'
 ```
