@@ -4,7 +4,7 @@ apiVersion: v1
 metadata:
   name: robot-shop
 ---
-apiVersion: apps/v1
+apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: cart
@@ -55,7 +55,7 @@ spec:
     service: cart
 
 ---
-apiVersion: apps/v1
+apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: catalogue
@@ -108,7 +108,7 @@ spec:
     service: catalogue
 
 ---
-apiVersion: apps/v1
+apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: dispatch
@@ -161,7 +161,7 @@ spec:
     service: dispatch
 
 ---
-apiVersion: apps/v1
+apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: mongodb
@@ -364,7 +364,7 @@ spec:
     service: mysql
 
 ---
-apiVersion: apps/v1
+apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: payment
@@ -418,7 +418,7 @@ spec:
     service: payment
 
 ---
-apiVersion: apps/v1
+apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: rabbitmq
@@ -473,7 +473,7 @@ spec:
     service: rabbitmq
 
 ---
-apiVersion: apps/v1
+apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: ratings
@@ -521,7 +521,7 @@ spec:
     service: ratings
 
 ---
-apiVersion: apps/v1
+apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   labels:
@@ -588,7 +588,7 @@ spec:
     service: redis
 
 ---
-apiVersion: apps/v1
+apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: shipping
@@ -637,7 +637,7 @@ spec:
     service: shipping
 
 ---
-apiVersion: apps/v1
+apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: user
@@ -691,7 +691,7 @@ spec:
     service: user
 
 ---
-apiVersion: apps/v1
+apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: web
