@@ -4,6 +4,51 @@ apiVersion: v1
 metadata:
   name: robot-shop
 ---
+apiVersion: authorization.openshift.io/v1
+groupNames: null
+kind: RoleBinding
+metadata:
+  name: system:deployers
+  namespace: robot-shop
+roleRef:
+  name: system:deployer
+subjects:
+- kind: ServiceAccount
+  name: deployer
+  namespace: robot-shop
+userNames:
+- system:serviceaccount:robot-shop:deployer
+---
+apiVersion: authorization.openshift.io/v1
+groupNames: null
+kind: RoleBinding
+metadata:
+  name: system:image-builders
+  namespace: robot-shop
+roleRef:
+  name: system:image-builder
+subjects:
+- kind: ServiceAccount
+  name: builder
+  namespace: robot-shop
+userNames:
+- system:serviceaccount:robot-shop:builder
+---
+apiVersion: authorization.openshift.io/v1
+groupNames:
+- system:serviceaccounts:robot-shop
+kind: RoleBinding
+metadata:
+  name: system:image-pullers
+  namespace: robot-shop
+roleRef:
+  name: system:image-puller
+subjects:
+- kind: SystemGroup
+  name: system:serviceaccounts:robot-shop
+userNames: null
+
+---
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
