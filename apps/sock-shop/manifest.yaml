@@ -44,43 +44,43 @@ groupNames: null
 kind: RoleBinding
 metadata:
   name: system:deployers
-  namespace: robot-shop
+  namespace: sock-shop
 roleRef:
   name: system:deployer
 subjects:
 - kind: ServiceAccount
   name: deployer
-  namespace: robot-shop
+  namespace: sock-shop
 userNames:
-- system:serviceaccount:robot-shop:deployer
+- system:serviceaccount:sock-shop:deployer
 ---
 apiVersion: authorization.openshift.io/v1
 groupNames: null
 kind: RoleBinding
 metadata:
   name: system:image-builders
-  namespace: robot-shop
+  namespace: sock-shop
 roleRef:
   name: system:image-builder
 subjects:
 - kind: ServiceAccount
   name: builder
-  namespace: robot-shop
+  namespace: sock-shop
 userNames:
-- system:serviceaccount:robot-shop:builder
+- system:serviceaccount:sock-shop:builder
 ---
 apiVersion: authorization.openshift.io/v1
 groupNames:
-- system:serviceaccounts:robot-shop
+- system:serviceaccounts:sock-shop
 kind: RoleBinding
 metadata:
   name: system:image-pullers
-  namespace: robot-shop
+  namespace: sock-shop
 roleRef:
   name: system:image-puller
 subjects:
 - kind: SystemGroup
-  name: system:serviceaccounts:robot-shop
+  name: system:serviceaccounts:sock-shop
 userNames: null
 
 ---
