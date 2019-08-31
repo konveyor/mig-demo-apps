@@ -1,0 +1,16 @@
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: file-uploader
+  name: file-uploader
+  namespace: file-uploader
+spec:
+  port:
+    targetPort: 8080-tcp
+  to:
+    kind: Service
+    name: file-uploader
+    weight: 100
+  wildcardPolicy: None
