@@ -1,6 +1,6 @@
 ---
 apiVersion: v1
-kind: Namespace
+kind: ProjectRequest
 metadata:
   name: sock-shop
 
@@ -38,51 +38,6 @@ defaultAddCapabilities:
 - SETUID
 - NET_BIND_SERVICE
 - DAC_OVERRIDE
----
-apiVersion: authorization.openshift.io/v1
-groupNames: null
-kind: RoleBinding
-metadata:
-  name: system:deployers
-  namespace: sock-shop
-roleRef:
-  name: system:deployer
-subjects:
-- kind: ServiceAccount
-  name: deployer
-  namespace: sock-shop
-userNames:
-- system:serviceaccount:sock-shop:deployer
----
-apiVersion: authorization.openshift.io/v1
-groupNames: null
-kind: RoleBinding
-metadata:
-  name: system:image-builders
-  namespace: sock-shop
-roleRef:
-  name: system:image-builder
-subjects:
-- kind: ServiceAccount
-  name: builder
-  namespace: sock-shop
-userNames:
-- system:serviceaccount:sock-shop:builder
----
-apiVersion: authorization.openshift.io/v1
-groupNames:
-- system:serviceaccounts:sock-shop
-kind: RoleBinding
-metadata:
-  name: system:image-pullers
-  namespace: sock-shop
-roleRef:
-  name: system:image-puller
-subjects:
-- kind: SystemGroup
-  name: system:serviceaccounts:sock-shop
-userNames: null
-
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
