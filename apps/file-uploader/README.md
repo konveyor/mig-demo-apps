@@ -1,6 +1,6 @@
-# Robot Shop
+# File Uploader App
 
-An e-commerce website that sells robots.
+A simple PHP file upload application.
 
 ## Installation
 
@@ -35,7 +35,7 @@ After successful installation, the app should be exposed at a facing URL. Wait f
 To get the url to the frontend:
 
 ```bash
-oc get route -n robot-shop front-end -o go-template='{{ .spec.host }}{{ println }}'
+oc get route -n file-uploader file-uploader -o go-template='{{ .spec.host }}{{ println }}'
 ```
 
 Visit the URL and order robots for free. These robots are terrible. Don't use them to invade the world!
