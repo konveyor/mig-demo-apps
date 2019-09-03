@@ -29,3 +29,19 @@ A website that shows popular Historic Sites and National Parks on a map.
 Find README here : [./apps/parks-app/README.md](./apps/parks-app/README.md)
 
 Credits : [https://github.com/OpenShiftDemos/restify-mongodb-parks](https://github.com/OpenShiftDemos/restify-mongodb-parks)
+
+## MsSQL App
+
+MsSQL server with a .NET frontend app.
+
+Find README here : [./apps/mssql-app/README.md](./apps/mssql-app/README.md)
+
+Credits : [https://github.com/microsoft/sqllinuxlabs](https://github.com/microsoft/sqllinuxlabs)
+
+## File Uploader App
+
+A PHP application to upload arbitrary files.
+
+Find README here : [./apps/file-uploader/README.md](./apps/file-uploader/README.md)
+
+Credits : [https://github.com/christianh814/openshift-php-upload-demo](https://github.com/christianh814/openshift-php-upload-demo)
