@@ -1,0 +1,122 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <value>file:${activemq.conf}/credentials.properties</value>
+        </property>
+    </bean>
+    <bean id="logQuery" class="io.fabric8.insight.log.log4j.Log4jLogQuery"
+          lazy-init="false" scope="singleton"
+          init-method="start" destroy-method="stop">
+    </bean>
+    <broker xmlns="http://activemq.apache.org/schema/core" brokerName="${HOSTNAME}" dataDirectory="${activemq.data}" start="false">
+
+		<destinations>	
+			
+	    </destinations>
+        <destinationPolicy>
+            <policyMap>
+                <policyEntries>
+                    <policyEntry queue=">" producerFlowControl="true" memoryLimit="1mb" maxBrowsePageSize="700">
+             
+                        <networkBridgeFilterFactory>
+                            <conditionalNetworkBridgeFilterFactory replayWhenNoConsumers="true" replayDelay="500" />
+                        </networkBridgeFilterFactory>
+                    </policyEntry>
+                    <policyEntry topic=">" producerFlowControl="true">                        
+                        <pendingMessageLimitStrategy>
+                            <constantPendingMessageLimitStrategy limit="1000" />
+                        </pendingMessageLimitStrategy>
+                    </policyEntry>
+                </policyEntries>
+            </policyMap>
+        </destinationPolicy>
+
+        <managementContext>
+            <managementContext createConnector="false" />
+        </managementContext>
+
+          <networkConnectors>
+		<networkConnector userName="${AMQ_USER}" password="${AMQ_PASSWORD}" uri="${AMQ_MESH_DISCOVERY_TYPE}://${AMQ_MESH_SERVICE_NAME}:61616/?transportType=tcp" messageTTL="-1" consumerTTL="1" />
+          	
+	  </networkConnectors>
+
+          <persistenceAdapter>
+              <kahaDB directory="${activemq.data}/kahadb" />
+          </persistenceAdapter>
+
+          <plugins>
+              <runtimeConfigurationPlugin checkPeriod="10000" />
+
+              <jaasAuthenticationPlugin configuration="activemq-file" />
+              <!-- jaasAuthenticationPlugin configuration="activemq-ldap" / -->
+              <!--
+              <authorizationPlugin>
+                <map>
+                  <authorizationMap>
+                    <authorizationEntries>
+                      <authorizationEntry queue=">"
+                                          read="admins"
+                                          write="admins"
+                                          admin="admins" />
+
+                      <authorizationEntry queue="sample-queue-odd"
+                                          read="users-odd"
+                                          write="users-odd"
+                                          admin="admins" />
+                      <authorizationEntry queue="sample-queue-even"
+                                          read="users-even"
+                                          write="users-even"
+                                          admin="admins" />
+
+                      <authorizationEntry queue="sample-queue-undelivery"
+                                          read="users-even"
+                                          write="users-even"
+                                          admin="admins" />
+
+                      <authorizationEntry topic="ActiveMQ.Advisory.>"
+                                          read="admins,users-odd,users-even"
+                                          write="admins,users-odd,users-even"
+                                          admin="admins,users-odd,users-even"/>
+                    </authorizationEntries>
+                  </authorizationMap>
+                </map>
+              </authorizationPlugin>
+              -->
+          </plugins>
+          <systemUsage>
+                <systemUsage>
+                    <memoryUsage>
+                        <memoryUsage percentOfJvmHeap="60" />
+                    </memoryUsage>
+                    <storeUsage>
+                        <storeUsage limit="100 gb" />
+                    </storeUsage>
+                    <tempUsage>
+                        <tempUsage limit="75 gb" />
+                    </tempUsage>
+                </systemUsage>
+            </systemUsage>
+         <transportConnectors>
+            <transportConnector name="openwire" uri="tcp://0.0.0.0:61616?maximumConnections=1000&amp;wireFormat.maxFrameSize=104857600" />
+            <transportConnector name="ssl" uri="ssl://0.0.0.0:61617?maximumConnections=1000&amp;wireFormat.maxFrameSize=104857600" />
+            <transportConnector name="mqtt" uri="mqtt://0.0.0.0:1883?maximumConnections=1000&amp;wireFormat.maxFrameSize=104857600" />
+            <transportConnector name="mqtt+ssl" uri="mqtt+ssl://0.0.0.0:8883?maximumConnections=1000&amp;wireFormat.maxFrameSize=104857600" />
+        </transportConnectors>
+
+		<sslContext>
+				<sslContext keyStore="file:${AMQ_KEYSTORE_TRUSTSTORE_DIR}/${AMQ_KEYSTORE}"            
+                        keyStorePassword="${AMQ_KEYSTORE_PASSWORD}"                        
+                        trustStore="file:${AMQ_KEYSTORE_TRUSTSTORE_DIR}/${AMQ_TRUSTSTORE}"
+                        trustStorePassword="${AMQ_TRUSTSTORE_PASSWORD}" />
+        </sslContext>
+            <!-- destroy the spring context on shutdown to stop jetty -->
+        <shutdownHooks>
+                <bean xmlns="http://www.springframework.org/schema/beans" class="org.apache.activemq.hooks.SpringContextHook" />
+        </shutdownHooks>
+
+    </broker>
+</beans>

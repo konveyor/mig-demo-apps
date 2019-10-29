@@ -1,0 +1,82 @@
+<jmxtrans-agent>
+	<queries>
+    <!-- ACTIVE MQ -->
+    <!-- Topics -->
+    <query
+      objectName="org.apache.activemq:type=Broker,brokerName=*,destinationType=Topic,destinationName=*"
+      attributes="EnqueueCount,DequeueCount,QueueSize,ExpiredCount,ConsumerCount,MemoryUsageByteCount,ProducerCount"
+      resultAlias="activemq.topic.#attribute#,brokerName=%brokerName%,destinationName=%destinationName%,host=#hostname#,environment=${environment:des},service=${AMQ_MESH_SERVICE_NAME:none}"/>
+
+		<!-- Queues -->
+    <query
+      objectName="org.apache.activemq:type=Broker,brokerName=*,destinationType=Queue,destinationName=*"
+      attributes="AverageEnqueueTime,AverageMessageSize,InFlightCount,MaxEnqueueTime,MaxMessageSize,MinEnqueueTime,MinMessageSize,EnqueueCount,DequeueCount,QueueSize,ExpiredCount,ConsumerCount,MemoryUsageByteCount,ProducerCount"
+      resultAlias="activemq.queue.#attribute#,brokerName=%brokerName%,destinationName=%destinationName%,host=#hostname#,environment=${environment:des},service=${AMQ_MESH_SERVICE_NAME:none}"/>
+
+    <!-- KahaDB Persistence -->
+    <query
+    	objectName="org.apache.activemq:type=Broker,brokerName=*,service=PersistenceAdapter,instanceName=*"
+      attributes="Data,Size"
+      resultAlias="activemq.kahadb.#attribute#,brokerName=%brokerName%,instance=%instanceName%,host=#hostname#,environment=${environment:des},service=${AMQ_MESH_SERVICE_NAME:none}" />
+
+    <!-- Broker -->
+    <query
+    	objectName="org.apache.activemq:type=Broker,brokerName=*"
+      attributes="StoreLimit,MemoryLimit,TempLimit,StorePercentUsage,MemoryPercentUsage,TempPercentUsage,UptimeMillis,MinMessageSize,MaxMessageSize"
+      resultAlias="activemq.broker.#attribute#,brokerName=%brokerName%,instance=%instanceName%,host=#hostname#,environment=${environment:des},service=${AMQ_MESH_SERVICE_NAME:none}" />
+
+    <!-- JVM -->
+      <query
+        objectName="java.lang:type=Memory"
+        attributes="HeapMemoryUsage,NonHeapMemoryUsage"
+        resultAlias="activemq.memory.#attribute#,tenant=ut,domain=core,environment=pre,namespace=ut-cms-pre"
+      />
+      <query
+        objectName="java.lang:type=MemoryPool,name=*"
+        attributes="Usage"
+        resultAlias="activemq.memorypool.#attribute#,name=%name%,tenant=ut,domain=core,environment=pre,namespace=ut-cms-pre"
+      />
+      <query
+        objectName="java.lang:type=GarbageCollector,name=*"
+        attributes="CollectionCount,CollectionTime"
+        resultAlias="activemq.gc.#attribute#,type=%name%,tenant=ut,domain=core,environment=pre,namespace=ut-cms-pre"
+      />
+      <query
+        objectName="java.lang:type=Threading"
+        attributes="DaemonThreadCount,PeakThreadCount,ThreadCount,TotalStartedThreadCount"
+        resultAlias="activemq.threads.#attribute#,tenant=ut,domain=core,environment=pre,namespace=ut-cms-pre"
+      />
+
+	</queries>
+
+  <!-- Output Writers -->
+	<!--
+	<outputWriter class="org.jmxtrans.agent.ConsoleOutputWriter" />
+	-->
+
+  <!-- Kafka InfluxDB -->
+  <!--
+  <outputWriter class="org.jmxtrans.agent.kafka.KafkaInfluxDbOutputWriter">
+		<bootstrap.servers>axdeskafka1n1:9092,axdeskafka1n2:9092,axdeskafka1n3:9092</bootstrap.servers>
+		<key.serializer>org.apache.kafka.common.serialization.StringSerializer</key.serializer>
+		<value.serializer>org.apache.kafka.common.serialization.StringSerializer</value.serializer>
+		<topic>app.axdesocp1.metrics</topic>
+	</outputWriter>
+	<resultNameStrategy class="org.jmxtrans.agent.kafka.KafkaInfluxDbResultNameStrategy" />
+  -->
+
+  <!-- Kafka InfluxDB Group -->
+  <outputWriter class="org.jmxtrans.agent.kafka.KafkaInfluxDbOutputWriter">
+    <!-- <bootstrap.servers>CHANGE_ME</bootstrap.servers> -->
+    <key.serializer>org.apache.kafka.common.serialization.StringSerializer</key.serializer>
+    <value.serializer>org.apache.kafka.common.serialization.StringSerializer</value.serializer>
+    <topic>app.axdesocp1.metrics</topic>
+    <acks>1</acks>
+    <linger.ms>0</linger.ms>
+  </outputWriter>
+  <resultNameStrategy class="org.jmxtrans.agent.kafka.KafkaInfluxDbResultNameStrategy" />
+
+  <!-- Other Properties -->
+	<collectIntervalInSeconds>5</collectIntervalInSeconds>
+	<reloadConfigurationCheckIntervalInSeconds>300</reloadConfigurationCheckIntervalInSeconds>
+</jmxtrans-agent>
