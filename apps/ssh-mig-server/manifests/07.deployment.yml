@@ -1,0 +1,54 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ssh-server
+  namespace: test-ssh
+  labels:
+    ssh-server: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      ssh-server: "true"
+  template:
+    metadata:
+      labels:
+        ssh-server: "true"
+    spec:
+      serviceAccountName: "ssh-server"
+      containers:
+        - image: quay.io/dgrigore/ssh-server
+          imagePullPolicy: Always
+          name: ssh-server
+          ports:
+            - containerPort: 22
+              name: ssh
+          volumeMounts:
+            - name: data
+              mountPath: /var/data
+            - name: ssh-server-keys
+              mountPath: /etc/ssh/
+              readOnly: true
+          securityContext:
+            privileged: true
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: ssh-server-claim
+        - name: ssh-server-keys
+          secret:
+            secretName: ssh-server-keys
+            items:
+              - key: ssh_host_rsa_key
+                path: ssh_host_rsa_key
+                mode: 256
+              - key: ssh_host_ecdsa_key
+                path: ssh_host_ecdsa_key
+                mode: 256
+              - key: ssh_host_ed25519_key
+                path: ssh_host_ed25519_key
+                mode: 256
+              - key: sshd_config
+                path: sshd_config
+      restartPolicy: Always
