@@ -8,7 +8,7 @@ metadata:
   namespace: amq-consumer
 spec:
   accessModes:
-  - ReadWriteMany
+  - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi
