@@ -318,7 +318,7 @@ objects:
     name: ${APPLICATION_NAME}-amq-claim
   spec:
     accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
     resources:
       requests:
         storage: ${VOLUME_CAPACITY}
