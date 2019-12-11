@@ -1,0 +1,220 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+          http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
+
+    <!-- Allows us to use encrypted system properties as variables in this configuration file -->
+    <bean id="environmentVariablesConfiguration" class="org.jasypt.encryption.pbe.config.EnvironmentStringPBEConfig">
+      <property name="algorithm" value="PBEWithMD5AndDES" />
+      <property name="passwordEnvName" value="ACTIVEMQ_ENCRYPTION_PASSWORD" />
+    </bean>
+
+    <bean id="configurationEncryptor" class="org.jasypt.encryption.pbe.StandardPBEStringEncryptor">
+      <property name="config" ref="environmentVariablesConfiguration" />
+    </bean>
+
+    <bean id="propertyConfigurer" class="org.jasypt.spring31.properties.EncryptablePropertyPlaceholderConfigurer">
+        <constructor-arg ref="configurationEncryptor" />
+        <property name="location" value="file:${activemq.conf}/credentials-enc.properties"/>
+    </bean>
+
+    <!--
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+      <property name="locations">
+        <value>file:${activemq.conf}/credentials.properties</value>
+      </property>
+    </bean>
+    -->
+
+    <bean id="logQuery" class="io.fabric8.insight.log.log4j.Log4jLogQuery"
+          lazy-init="false" scope="singleton"
+          init-method="start" destroy-method="stop">
+    </bean>
+
+    <broker xmlns="http://activemq.apache.org/schema/core" brokerName="${HOSTNAME}" dataDirectory="${activemq.data}" start="false" schedulePeriodForDiskUsageCheck="60000">
+      <destinations>
+      </destinations>
+
+      <!--
+      <destinationInterceptors>
+        <virtualDestinationInterceptor>
+          <virtualDestinations>
+            <virtualTopic name="store.>" prefix="*." selectorAware="false" />
+          </virtualDestinations>
+        </virtualDestinationInterceptor>
+      </destinationInterceptors>
+      -->
+
+      <destinationPolicy>
+        <policyMap>
+          <policyEntries>
+            <policyEntry queue=">" producerFlowControl="true" memoryLimit="1mb" maxBrowsePageSize="700" optimizedDispatch="true">
+              <networkBridgeFilterFactory>
+                <conditionalNetworkBridgeFilterFactory replayWhenNoConsumers="true" replayDelay="500" />
+              </networkBridgeFilterFactory>
+              <deadLetterStrategy>
+                <!-- Expiring messages in DLQ with more than 1 day: 86400000 -->
+                <!--
+                <sharedDeadLetterStrategy expiration="86400000"/>
+                -->
+                <discarding />
+              </deadLetterStrategy>
+            </policyEntry>
+            <policyEntry topic=">" producerFlowControl="true" >
+              <pendingMessageLimitStrategy>
+                <constantPendingMessageLimitStrategy limit="1000" />
+              </pendingMessageLimitStrategy>
+              <slowConsumerStrategy>
+                <abortSlowAckConsumerStrategy ignoreIdleConsumers="false" abortConnection="true" maxSlowDuration="30000" checkPeriod="600000" />
+              </slowConsumerStrategy>
+            </policyEntry>
+
+            <!-- Performance Test -->
+            <policyEntry queue="amq-performance.>" producerFlowControl="false" memoryLimit="100mb" maxBrowsePageSize="1000"
+              optimizedDispatch="true" storeUsageHighWaterMark="75" cursorMemoryHighWaterMark="75" queuePrefetch="100">
+              <networkBridgeFilterFactory>
+                <conditionalNetworkBridgeFilterFactory replayWhenNoConsumers="true" replayDelay="500" />
+              </networkBridgeFilterFactory>
+              <deadLetterStrategy>
+                <!-- Expiring messages in DLQ with more than 1 day: 86400000 -->
+                <sharedDeadLetterStrategy expiration="43200000"/>
+              </deadLetterStrategy>
+            </policyEntry>
+          </policyEntries>
+        </policyMap>
+      </destinationPolicy>
+
+      <managementContext>
+        <managementContext createConnector="false" />
+      </managementContext>
+
+      <networkConnectors>
+        <networkConnector
+          userName="${AMQ_USER}"
+          password="${AMQ_PASSWORD}"
+          uri="${AMQ_MESH_DISCOVERY_TYPE}://${AMQ_MESH_SERVICE_NAME}:61616/?transportType=nio"
+          messageTTL="-1" consumerTTL="1" >
+            <excludedDestinations>
+              <!-- no, not a jms bridge, just a network connector that excludes
+              topics and by default will forward all queues. -->
+              <!--
+              <queue physicalName="*.store.>"/>
+              -->
+              <topic physicalName="*.store.>"/>
+              <topic physicalName="devicevalues.>"/>
+              <topic physicalName="devicealerts.>"/>
+              <topic physicalName="agentstatus.>"/>
+          </excludedDestinations>
+        </networkConnector>
+      </networkConnectors>
+
+      <persistenceAdapter>
+        <kahaDB directory="${activemq.data}/kahadb" checkForCorruptJournalFiles="true"
+          journalMaxFileLength="512mb" preallocationStrategy="zeros"
+          ignoreMissingJournalfiles="true" />
+      </persistenceAdapter>
+
+      <plugins>
+        <runtimeConfigurationPlugin checkPeriod="10000" />
+
+        <!--<jaasAuthenticationPlugin configuration="activemq-ldap" /> -->
+        <jaasAuthenticationPlugin configuration="activemq-file" />
+        <authorizationPlugin>
+          <map>
+            <authorizationMap>
+              <authorizationEntries>
+                <authorizationEntry queue=">"
+                                    read="admins"
+                                    write="admins"
+                                    admin="admins" />
+                <authorizationEntry queue="store.>"
+                                    read="amq-read"
+                                    write="amq-write"
+                                    admin="admins,amq-read,amq-write" />
+                <authorizationEntry queue="*.store.>"
+                                    read="amq-read"
+                                    write="amq-write"
+                                    admin="admins,amq-read,amq-write" />
+
+                <authorizationEntry topic=">"
+                                    read="admins"
+                                    write="admins"
+                                    admin="admins" />
+
+                <authorizationEntry topic="store.>"
+                                    read="amq-read"
+                                    write="amq-write"
+                                    admin="admins,amq-read,amq-write" />
+                <authorizationEntry topic="*.store.>"
+                                    read="amq-read"
+                                    write="amq-write"
+                                    admin="admins,amq-read,amq-write" />
+
+                <authorizationEntry topic="devicevalues.>"
+                                    read="amq-read"
+                                    write="amq-write"
+                                    admin="amq-read,amq-write" />
+
+                <authorizationEntry topic="devicealerts.>"
+                                    read="amq-read"
+                                    write="amq-write"
+                                    admin="amq-read,amq-write" />
+                <!-- Entry to use when mqtt-virtual-topic-subscriptions strategy is activated  -->
+                <!-- transport.subscriptionStrategy=mqtt-virtual-topic-subscriptions -->
+                <authorizationEntry topic="*.devicealerts.>"
+                                    read="amq-read"
+                                    write="amq-write"
+                                    admin="amq-read,amq-write" />
+
+                <authorizationEntry topic="agentstatus.>"
+                                    read="amq-read"
+                                    write="amq-write"
+                                    admin="amq-read,amq-write" />
+
+                <authorizationEntry topic="ActiveMQ.Advisory.>"
+                                    read="admins,amq-read,amq-write"
+                                    write="admins,amq-read,amq-write"
+                                    admin="admins,amq-read,amq-write"/>
+              </authorizationEntries>
+            </authorizationMap>
+          </map>
+        </authorizationPlugin>
+        </plugins>
+
+        <systemUsage>
+          <systemUsage>
+            <memoryUsage>
+              <memoryUsage percentOfJvmHeap="75" />
+            </memoryUsage>
+            <storeUsage>
+              <storeUsage limit="2 gb" />
+            </storeUsage>
+            <tempUsage>
+              <tempUsage limit="512 mb" />
+            </tempUsage>
+          </systemUsage>
+        </systemUsage>
+
+        <transportConnectors>
+          <transportConnector name="openwire" uri="tcp://0.0.0.0:61616?maximumConnections=1000&amp;wireFormat.maxFrameSize=104857600" />
+          <transportConnector name="nio+ssl" uri="nio+ssl://0.0.0.0:61617?maximumConnections=1000&amp;wireFormat.maxFrameSize=104857600" />
+          <!--
+          <transportConnector name="mqtt+nio+ssl" uri="mqtt+nio+ssl://0.0.0.0:8883?maximumConnections=1000&amp;wireFormat.maxFrameSize=104857600&amp;" />
+          -->
+          <transportConnector name="mqtt+nio+ssl" uri="mqtt+nio+ssl://0.0.0.0:8883?maximumConnections=1000&amp;wireFormat.maxFrameSize=104857600&amp;transport.subscriptionStrategy=mqtt-virtual-topic-subscriptions" />
+        </transportConnectors>
+
+        <sslContext>
+          <sslContext keyStore="file:${AMQ_KEYSTORE_TRUSTSTORE_DIR}/${AMQ_KEYSTORE}"
+                      keyStorePassword="${AMQ_KEYSTORE_PASSWORD}"
+                      trustStore="file:${AMQ_KEYSTORE_TRUSTSTORE_DIR}/${AMQ_TRUSTSTORE}"
+                      trustStorePassword="${AMQ_TRUSTSTORE_PASSWORD}" />
+        </sslContext>
+
+        <!-- destroy the spring context on shutdown to stop jetty -->
+        <shutdownHooks>
+          <bean xmlns="http://www.springframework.org/schema/beans" class="org.apache.activemq.hooks.SpringContextHook" />
+        </shutdownHooks>
+    </broker>
+</beans>

@@ -1,0 +1,78 @@
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    app: bm-amq-consumer
+  name: bm-amq-consumer
+  namespace: amq-consumer
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    app: bm-amq-consumer
+    deploymentconfig: bm-amq-consumer
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      annotations:
+        openshift.io/generated-by: OpenShiftNewApp
+      creationTimestamp: null
+      labels:
+        app: bm-amq-consumer
+        deploymentconfig: bm-amq-consumer
+    spec:
+      containers:
+        - env:
+            - name: ACTIVEMQ_BROKER_PASSWORD
+              value: p4ss
+            - name: ACTIVEMQ_BROKER_USERNAME
+              value: admin
+            - name: ACTIVEMQ_SERVICE_HOST
+              value: amq-broker-ssl-amq-tcp.amq-core.svc.cluster.local
+            - name: ACTIVEMQ_SERVICE_PORT
+              value: "61616"
+            - name: ACTIVEMQ_SERVICE_PROTOCOL
+              value: tcp
+            - name: CONSUMERS
+              value: "20"
+            - name: JAVA_MAX_MEM_RATIO
+              value: "75"
+            - name: MAX_CONNECTIONS
+              value: "50"
+            - name: PERFORMANCE_QUEUE_ONE
+              value: amq-performance.inbox
+          image: quay.io/dgrigore/bm-amq-consumer:stable
+          imagePullPolicy: Always
+          name: bm-amq-consumer
+          ports:
+            - containerPort: 9779
+              protocol: TCP
+            - containerPort: 8080
+              protocol: TCP
+            - containerPort: 8778
+              protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: "/var/state"
+              name: consumer-state
+      volumes:
+        - name: consumer-state
+          persistentVolumeClaim:
+            claimName: consumer-state
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30

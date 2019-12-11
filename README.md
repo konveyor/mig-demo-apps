@@ -45,3 +45,9 @@ A PHP application to upload arbitrary files.
 Find README here : [./apps/file-uploader/README.md](./apps/file-uploader/README.md)
 
 Credits : [https://github.com/christianh814/openshift-php-upload-demo](https://github.com/christianh814/openshift-php-upload-demo)
+
+## AMQ app
+
+A sample 3 namespace application, which consists from AMQ consumer, producer and broker, all located in separate namespaces. Communication is provided by internal service network.
+
+Find README here : [./apps/amq-app/README.md](./apps/amq-app/README.md)
