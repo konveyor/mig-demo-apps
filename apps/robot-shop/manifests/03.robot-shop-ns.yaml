@@ -1,5 +1,5 @@
 ---
-kind: Namespace
+kind: ProjectRequest
 apiVersion: v1
 metadata:
   name: robot-shop

@@ -1,8 +1,9 @@
 ---
-kind: Namespace
+kind: ProjectRequest
 apiVersion: v1
 metadata:
   name: robot-shop
+
 ---
 apiVersion: apps/v1beta1
 kind: Deployment
