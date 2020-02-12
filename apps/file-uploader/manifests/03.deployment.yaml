@@ -2,6 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  namespace: file-uploader
   name: file-uploader-vol-claim
 spec: 
   accessModes:
