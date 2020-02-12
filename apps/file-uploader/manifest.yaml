@@ -57,6 +57,17 @@ spec:
     type: Generic
 
 ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: file-uploader-vol-claim
+spec: 
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi
+---
 apiVersion: apps.openshift.io/v1
 kind: DeploymentConfig
 metadata:
@@ -94,6 +105,13 @@ spec:
           protocol: TCP
         - containerPort: 8080
           protocol: TCP
+        volumeMounts:
+        - mountPath: "/opt/app-root/src/uploaded"
+          name: file-uploader-vol
+      volumes:
+      - name: file-uploader-vol
+        persistentVolumeClaim:
+          claimName: file-uploader-vol-claim
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
