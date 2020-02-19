@@ -2,7 +2,7 @@
 kind: ProjectRequest
 apiVersion: v1
 metadata:
-  name: mssql-example
+  name: mssql-persistent
   labels:
     app: mssql
 ---
@@ -10,7 +10,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: mssql-secret
-  namespace: mssql-example
+  namespace: mssql-persistent
   labels:
     app: mssql
 stringData:
@@ -19,16 +19,16 @@ stringData:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: mssql-example-sa
-  namespace: mssql-example
+  name: mssql-persistent-sa
+  namespace: mssql-persistent
   labels:
-    component: mssql-example
+    component: mssql-persistent
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mssql-pvc
-  namespace: mssql-example
+  namespace: mssql-persistent
   labels:
     app: mssql
 spec:
@@ -41,7 +41,7 @@ spec:
 kind: SecurityContextConstraints
 apiVersion: v1
 metadata:
-  name: mssql-example-scc
+  name: mssql-persistent-scc
 allowPrivilegeEscalation: true
 allowPrivilegedContainer: true
 runAsUser:
@@ -56,13 +56,13 @@ volumes:
 - '*'
 users:
 - system:admin
-- system:serviceaccount:mssql-example:mssql-example-sa
+- system:serviceaccount:mssql-persistent:mssql-persistent-sa
 ---
 apiVersion: v1
 kind: DeploymentConfig
 metadata:
   name: mssql-deployment
-  namespace: mssql-example
+  namespace: mssql-persistent
   labels:
     app: mssql
 spec:
@@ -77,7 +77,7 @@ spec:
         name: mssql
         app: mssql
     spec:
-      serviceAccountName: mssql-example-sa
+      serviceAccountName: mssql-persistent-sa
       containers:
       - env:
         - name: ACCEPT_EULA
@@ -113,7 +113,7 @@ apiVersion: v1
 kind: Service
 metadata:
  name: mssql-service
- namespace: mssql-example
+ namespace: mssql-persistent
 spec:
  selector:
    app: mssql
@@ -128,7 +128,7 @@ apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
  name: mssql-app-deployment
- namespace: mssql-example
+ namespace: mssql-persistent
 spec:
  replicas: 1
  template:
@@ -137,7 +137,7 @@ spec:
        app: mssql-app
    spec:
      terminationGracePeriodSeconds: 10
-     serviceAccountName: mssql-example-sa
+     serviceAccountName: mssql-persistent-sa
      containers:
      - name: mssql-app
        image: quay.io/ocpmigrate/mssql-sample-app:microsoft
@@ -148,13 +148,13 @@ spec:
          privileged: true
        env:
        - name: ConnString
-         value: "Server=mssql-service.mssql-example.svc.cluster.local;Database=ProductCatalog;User ID=WebLogin; password=SQLPass1234!"
+         value: "Server=mssql-service.mssql-persistent.svc.cluster.local;Database=ProductCatalog;User ID=WebLogin; password=SQLPass1234!"
 ---
 apiVersion: v1
 kind: Service
 metadata:
  name: mssql-app-service
- namespace: mssql-example
+ namespace: mssql-persistent
 spec:
  selector:
    app: mssql-app
@@ -168,7 +168,7 @@ apiVersion: v1
 kind: Route
 metadata:
   name: mssql-app-route
-  namespace: mssql-example
+  namespace: mssql-persistent
 spec:
   path: "/"
   to:
