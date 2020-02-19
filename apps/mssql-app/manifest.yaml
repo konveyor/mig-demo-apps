@@ -5,7 +5,6 @@ metadata:
   name: mssql-example
   labels:
     app: mssql
-
 ---
 apiVersion: v1
 kind: Secret
@@ -16,7 +15,6 @@ metadata:
     app: mssql
 stringData:
   mssql-password: P@ssw0rd1!
-
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -25,7 +23,6 @@ metadata:
   namespace: mssql-example
   labels:
     component: mssql-example
-
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -40,7 +37,6 @@ spec:
   resources:
     requests:
       storage: 10Gi
-
 ---
 kind: SecurityContextConstraints
 apiVersion: v1
@@ -61,7 +57,6 @@ volumes:
 users:
 - system:admin
 - system:serviceaccount:mssql-example:mssql-example-sa
-
 ---
 apiVersion: v1
 kind: DeploymentConfig
@@ -113,7 +108,6 @@ spec:
       - name: mssql-vol
         persistentVolumeClaim:
           claimName: mssql-pvc
-
 ---
 apiVersion: v1
 kind: Service
@@ -129,7 +123,6 @@ spec:
      port: 1433
      targetPort: 1433
  type: LoadBalancer
-
 ---
 apiVersion: apps/v1beta1
 kind: Deployment
@@ -156,7 +149,6 @@ spec:
        env:
        - name: ConnString
          value: "Server=mssql-service.mssql-example.svc.cluster.local;Database=ProductCatalog;User ID=WebLogin; password=SQLPass1234!"
-
 ---
 apiVersion: v1
 kind: Service
@@ -171,7 +163,6 @@ spec:
      protocol: TCP
      port: 5000
      targetPort: 5000
-
 ---
 apiVersion: v1
 kind: Route
