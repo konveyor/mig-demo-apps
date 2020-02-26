@@ -74,6 +74,7 @@ metadata:
   name: catalogue-data-volume-claim
   namespace: sock-shop
 spec:
+  storageClassName: ""
   accessModes:
     - ReadWriteOnce
   resources:
