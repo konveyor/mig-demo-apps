@@ -81,11 +81,13 @@ metadata:
   name: carts-data-volume-claim
   namespace: sock-shop
 spec:
+  storageClassName: ""
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 10Gi
+
 ---
 apiVersion: v1
 kind: Service
@@ -330,6 +332,7 @@ metadata:
   name: catalogue-data-volume-claim
   namespace: sock-shop
 spec:
+  storageClassName: ""
   accessModes:
     - ReadWriteOnce
   resources:
@@ -556,11 +559,13 @@ metadata:
   name: orders-data-volume-claim
   namespace: sock-shop
 spec:
+  storageClassName: ""
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 10Gi
+
 ---
 apiVersion: v1
 kind: Service
@@ -1031,11 +1036,13 @@ metadata:
   name: user-data-volume-claim
   namespace: sock-shop
 spec:
+  storageClassName: ""
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 10Gi
+
 ---
 apiVersion: v1
 kind: Service
