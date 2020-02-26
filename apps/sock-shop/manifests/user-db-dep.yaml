@@ -41,6 +41,7 @@ metadata:
   name: user-data-volume-claim
   namespace: sock-shop
 spec:
+  storageClassName: ""
   accessModes:
     - ReadWriteOnce
   resources:

@@ -100,6 +100,7 @@ metadata:
   name: mysql-data-volume-claim
   namespace: robot-shop
 spec:
+  storageClassName: ""
   accessModes:
     - ReadWriteOnce
   resources:
@@ -112,6 +113,7 @@ metadata:
   name: mysql-scripts-volume-claim
   namespace: robot-shop
 spec:
+  storageClassName: ""
   accessModes:
     - ReadWriteOnce
   resources:

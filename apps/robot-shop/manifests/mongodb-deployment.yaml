@@ -43,6 +43,7 @@ metadata:
   name: mongodb-volume-claim
   namespace: robot-shop
 spec:
+  storageClassName: ""
   accessModes:
     - ReadWriteOnce
   resources:
