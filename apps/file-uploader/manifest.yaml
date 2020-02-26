@@ -77,7 +77,7 @@ metadata:
   name: file-uploader
   namespace: file-uploader
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     app: file-uploader
     deploymentconfig: file-uploader
