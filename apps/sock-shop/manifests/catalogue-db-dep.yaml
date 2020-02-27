@@ -22,7 +22,7 @@ spec:
           command:
           - /bin/sh
           - -c
-          - hostname && sleep 60 && /opt/rh/rh-mysql57/root/usr/bin/mysql --force -h $CATALOGUE_DB_SERVICE_HOST -u $MYSQL_USER -D $MYSQL_DATABASE -p$MYSQL_PASSWORD -P 3306 < /mysql-init/dump.sql
+          - hostname && sleep 120 && /opt/rh/rh-mysql57/root/usr/bin/mysql --force -h $CATALOGUE_DB_SERVICE_HOST -u $MYSQL_USER -D $MYSQL_DATABASE -p$MYSQL_PASSWORD -P 3306 < /mysql-init/dump.sql
   template:
     metadata:
       labels:
