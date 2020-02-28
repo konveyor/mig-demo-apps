@@ -46,6 +46,16 @@ Find README here : [./apps/file-uploader/README.md](./apps/file-uploader/README.
 
 Credits : [https://github.com/christianh814/openshift-php-upload-demo](https://github.com/christianh814/openshift-php-upload-demo)
 
+## Rocket Chat (Broken : Do Not Use)
+
+_See https://github.com/konveyor/mig-demo-apps/issues/18_
+
+A Node.js chat application.
+
+Find README here : [./apps/rocket-chat/README.md](./apps/rocket-chat/README.md)
+
+Credits : [https://github.com/RocketChat/Rocket.Chat](https://github.com/RocketChat/Rocket.Chat)
+
 ## AMQ app
 
 A sample 3 namespace application, which consists from AMQ consumer, producer and broker, all located in separate namespaces. Communication is provided by internal service network.
