@@ -56,6 +56,8 @@ Find README here : [./apps/rocket-chat/README.md](./apps/rocket-chat/README.md)
 
 Credits : [https://github.com/RocketChat/Rocket.Chat](https://github.com/RocketChat/Rocket.Chat)
 
+License : [./apps/rocket-chat/LICENSE](./apps/rocket-chat/LICENSE)
+
 ## AMQ app
 
 A sample 3 namespace application, which consists from AMQ consumer, producer and broker, all located in separate namespaces. Communication is provided by internal service network.
