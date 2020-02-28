@@ -48,6 +48,8 @@ Credits : [https://github.com/christianh814/openshift-php-upload-demo](https://g
 
 ## Rocket Chat (Broken : Do Not Use)
 
+_See https://github.com/konveyor/mig-demo-apps/issues/18_
+
 A Node.js chat application.
 
 Find README here : [./apps/rocket-chat/README.md](./apps/rocket-chat/README.md)
