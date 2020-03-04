@@ -74,20 +74,10 @@ spec:
       containers:
         - name: rocketchat-db
           image: docker.io/mongo:4.0
-          # image: registry.access.redhat.com/rhscl/mongodb-26-rhel7:latest
           command:
             - /bin/sh
-            - -c
-            - mongod --smallfiles --oplogSize 128 --replSet rs0 --storageEngine=mmapv1
-          env:
-            - name: MONGODB_USER
-              value: rocketchat
-            - name: MONGODB_PASSWORD
-              value: r0Ck3tChaT
-            - name: MONGODB_DATABASE
-              value: rocketchat
-            - name: MONGODB_ADMIN_PASSWORD
-              value: R0cK3TcHAt
+            - -c 
+            - mongod --bind_ip 0.0.0.0 --port 27017 --smallfiles --oplogSize 128 --replSet rs0 --storageEngine=mmapv1
           volumeMounts:
             - name: rocketchat-data-vol
               mountPath: /data/db
@@ -118,11 +108,10 @@ spec:
     spec:
       containers:
         - name: rocketchat
-          # image: docker.io/mongoclient/mongoclient:2.2.0 # rocket.chat:2.4.9
           image: rocket.chat:2.4.9
           env:
             - name: MONGO_URL
-              value: "mongodb://rocketchat:r0Ck3tChaT@rocket-chat-db:27017/rocketchat"
+              value: "mongodb://rocket-chat-db:27017/rocketchat"
             - name: MONGO_OPLOG_URL
               value: "mongodb://rocket-chat-db:27017/local"
           ports:
@@ -132,4 +121,18 @@ spec:
             requests:
               cpu: 100m
       restartPolicy: Always
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: rocket-chat
+  namespace: rocket-chat
+spec:
+  port:
+    targetPort: 3000
+  to:
+    kind: Service
+    name: rocket-chat
+    weight: 100
+  wildcardPolicy: None
 
