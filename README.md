@@ -46,9 +46,7 @@ Find README here : [./apps/file-uploader/README.md](./apps/file-uploader/README.
 
 Credits : [https://github.com/christianh814/openshift-php-upload-demo](https://github.com/christianh814/openshift-php-upload-demo)
 
-## Rocket Chat (Broken : Do Not Use)
-
-_See https://github.com/konveyor/mig-demo-apps/issues/18_
+## Rocket Chat
 
 A Node.js chat application.
 
