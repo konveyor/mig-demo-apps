@@ -213,7 +213,6 @@ spec:
     protocol: TCP
     port: 27017
     targetPort: 27017
-    nodePort: 0
   selector:
     name: mongodb
   portalIP: ''
