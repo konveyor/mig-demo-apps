@@ -43,7 +43,6 @@ metadata:
   namespace: robot-shop
   name: redis-volume-claim
 spec:
-  storageClassName: ""
   accessModes:
     - ReadWriteOnce
   resources:
