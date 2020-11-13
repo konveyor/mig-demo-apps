@@ -28,6 +28,8 @@ You may edit individual definitions for different app resources. To create an up
 
 This will combine all YAMLs and create an updated `manifest.yaml`.
 
+If you need to install this demo app on Openshift 4 run `./build.sh 4` to create adjust deployments to use the `apps/v1` API instead of `apps/v1beta1`.
+
 ## Usage
 
 After successful installation, the app should be exposed at a facing URL. Wait for 4-5 minutes for all the services to start.
