@@ -23,7 +23,7 @@ spec:
         command:
         - /bin/sh
         - -c
-        - cp -r /tmp/post-scripts/* /var/lib/mysql/ && mkdir /var/lib/mysql/data
+        - cp -r /tmp/post-scripts/* /var/lib/mysql/ && mkdir -p /var/lib/mysql/data
         imagePullPolicy: Always
         image: docker.io/pranavgaikwad/robot-shop-mysql-post-hook:latest
         volumeMounts:
