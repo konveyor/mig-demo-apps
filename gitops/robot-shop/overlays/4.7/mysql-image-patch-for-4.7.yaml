@@ -1,0 +1,9 @@
+- op: replace
+  path: /spec/triggers/0/imageChangeParams/from/name
+  value: mysql:8.0
+- op: replace
+  path: /spec/template/spec/containers/0/image
+  value: quay.io/pranavgaikwad/robot-shop-mysql-post-hook:ocp4.7
+- op: replace
+  path: /spec/strategy/recreateParams/post/execNewPod/command/2
+  value: sleep 120 && zcat /tmp/mysql-init-scripts/10-dump.sql.gz | /opt/rh/rh-mysql80/root/bin/mysql --force -h $MYSQL_SERVICE_HOST -u root -pR00t@123 -D $MYSQL_DATABASE -P 3306 && /opt/rh/rh-mysql80/root/bin/mysql -h $MYSQL_SERVICE_HOST -u root -pR00t@123 -P 3306 < /tmp/mysql-init-scripts/20-ratings.sql && sleep 60

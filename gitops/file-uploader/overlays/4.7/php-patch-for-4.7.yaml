@@ -1,0 +1,3 @@
+- op: replace
+  path: /spec/strategy/sourceStrategy/from/name
+  value: php:7.3

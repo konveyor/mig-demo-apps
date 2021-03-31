@@ -1,0 +1,6 @@
+- op: replace
+  path: /spec/triggers/0/imageChangeParams/from/name
+  value: mysql:8.0
+- op: replace
+  path: /spec/strategy/recreateParams/post/execNewPod/command/2
+  value: hostname && sleep 120 && /opt/rh/rh-mysql80/root/usr/bin/mysql --force -h $CATALOGUE_DB_SERVICE_HOST -u $MYSQL_USER -D $MYSQL_DATABASE -p$MYSQL_PASSWORD -P 3306 < /mysql-init/dump.sql
