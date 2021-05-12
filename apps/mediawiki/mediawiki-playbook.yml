@@ -1,0 +1,36 @@
+- hosts: localhost
+  gather_facts: false
+  tasks:
+  - name: "Get mediawiki pod"
+    shell: "oc get po -n mediawiki -l app=mediawiki --no-headers -o custom-columns='name:.metadata.name'"
+    register: pod_name
+
+  - name: "Get current wgServer value"
+    shell: "oc exec -n mediawiki {{ pod_name.stdout }} -- grep -i wgServer /persistent/LocalSettings.php | awk -F '\"' '{ print $(NF-1) }'"
+    register: old_wgserver
+
+  - name: "Print current value"
+    debug:
+      msg: "The old wgServer value is: {{ old_wgserver.stdout }}"
+
+  - name: "Get new route address"
+    shell: "oc get route -n mediawiki -l app=mediawiki --no-headers -o custom-columns='host:.spec.host'"
+    register: route_host
+
+  - name: "Print new route hostname"
+    debug:
+      msg: "The new route hostname is {{ route_host.stdout }}"
+
+  - name: "Replace wgServer value"
+    shell: "oc exec -n mediawiki {{ pod_name.stdout }} -- sed -i 's,^$wgServer.*,$wgServer = \"http://{{ route_host.stdout }}\";,g' /persistent/LocalSettings.php"
+
+  - name: "Get current wgServer value"
+    shell: "oc exec -n mediawiki {{ pod_name.stdout }} -- grep -i wgServer /persistent/LocalSettings.php | awk -F '\"' '{ print $(NF-1) }'"
+    register: new_wgserver
+
+  - name: "Print current value"
+    debug:
+      msg: "The new wgServer value is: {{ new_wgserver.stdout }}"
+
+  - name: "Restart mediawiki"
+    shell: "oc delete po -n mediawiki -l app=mediawiki"
