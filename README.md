@@ -61,3 +61,10 @@ License : [./apps/rocket-chat/LICENSE](./apps/rocket-chat/LICENSE)
 A sample 3 namespace application, which consists from AMQ consumer, producer and broker, all located in separate namespaces. Communication is provided by internal service network.
 
 Find README here : [./apps/amq-app/README.md](./apps/amq-app/README.md)
+
+## Mediawiki
+
+Useful for demonstrating hook usage
+
+Find README here : [./apps/mediawiki/README.md](./apps/mediawiki/README.md)
+
