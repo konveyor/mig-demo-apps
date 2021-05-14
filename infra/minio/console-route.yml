@@ -1,0 +1,14 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: minio-console
+  namespace: openshift-operators
+spec:
+  port:
+    targetPort: 9443
+  to:
+    kind: Service
+    name: minio-console
+  tls:
+    termination: passthrough
+  wildcardPolicy: None
