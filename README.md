@@ -68,3 +68,19 @@ Useful for demonstrating hook usage
 
 Find README here : [./apps/mediawiki/README.md](./apps/mediawiki/README.md)
 
+# Demo infrastructure
+These configurations are intended to provide basic configuration examples of storage and other infrastructure for use with MTC.
+
+## MCG / Noobaa
+
+A sample MCG deployment that can be used as an S3 backing store for MTC migrations
+
+Find README here : [./infra/mcg/README.md](./infra/mcg/README.md)
+
+## Minio
+
+A sample minio deployment that can be used as an S3 backing store for MTC migrations.
+
+While we recommend to use MCG/NooBaa for on-premise Object Storage needs, we are including other possible Object Storage for demo/testing purposes.
+
+Find README here : [./infra/minio/README.md](./infra/minio/README.md)

@@ -1,0 +1,25 @@
+apiVersion: minio.min.io/v2
+kind: Tenant
+metadata:
+  name: minio
+  namespace: openshift-operators
+spec:
+  console:
+    consoleSecret:
+      name: console-secret
+    replicas: 2
+  credsSecret:
+    name: minio-creds-secret
+  pools:
+  - servers: 3
+    volumeClaimTemplate:
+      apiVersion: v1
+      kind: persistentvolumeclaims
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+    volumesPerServer: 2
+  requestAutoCert: true
