@@ -261,7 +261,7 @@ spec:
           name: mysql-data-volume
       containers:
       - name: dataloader
-        image: registry.redhat.io/rhscl/mysql-57-rhel7:latest
+        image: registry.access.redhat.com/rhscl/mysql-57-rhel7:latest
         imagePullPolicy: Always
         volumeMounts:
         - mountPath: "/var/lib/mysql/"
@@ -279,7 +279,7 @@ spec:
           value: cities
       - name: mysql
         imagePullPolicy: Always
-        image: registry.redhat.io/rhscl/mysql-57-rhel7:latest
+        image: registry.access.redhat.com/rhscl/mysql-57-rhel7:latest
         ports:
         - containerPort: 3306
         env:
