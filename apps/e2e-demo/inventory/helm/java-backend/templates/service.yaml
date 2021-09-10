@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+spec:
+  ports:
+  - name: web
+    port: {{ .Values.port }}
+    targetPort: {{ .Values.targetPort }}
+  selector:
+    deployment: {{ .Values.applicationName }}
+metadata:
+  name: {{ .Values.applicationName }}
+  labels:
+    app: {{ .Values.applicationName }}
+  annotations:
+    description: The web server's http port

@@ -1,0 +1,17 @@
+
+applicationName: gateway
+port: 8080
+targetPort: 8080
+deploymentStrategy:
+  type: RollingUpdate
+  rollingMaxSurge: 25%
+  rollingMaxUnavailable: 20%
+replicaCount: 1
+health:
+  livenessEndpoint: /actuator/health
+  readinessEndpoint: /actuator/health
+  probeDelay: 5
+  probePeriod: 10
+  probeTimeout: 2
+imageURL: "quay.io/rromanni/gateway:fe-0.1"
+env: []

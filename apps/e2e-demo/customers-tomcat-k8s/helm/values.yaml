@@ -1,0 +1,35 @@
+
+applicationName: customers
+port: 8080
+targetPort: 8080
+deploymentStrategy:
+  type: RollingUpdate
+  rollingMaxSurge: 25%
+  rollingMaxUnavailable: 20%
+replicaCount: 1
+health:
+  livenessEndpoint: /health/live
+  readinessEndpoint: /health/ready
+  probeDelay: 5
+  probePeriod: 10
+  probeTimeout: 2
+imageURL: "quay.io/rofrano/customers-tomcat:0.1"
+env: []
+
+# Database variables for bitnami PostgreSQL
+postgresql:
+  postgresqlDatabase: "customers"
+  postgresqlUsername: "customers"
+  postgresqlPassword: "customers"
+  servicePort: "5432"
+
+# Generate an Ingress
+ingress:
+  enabled: true
+  tls: false
+  hostname: customers.end-game.10.19.2.21.nip.io
+  annotations:
+    kubernetes.io/ingress.class: haproxy
+    # kubernetes.io/ingress.class: "nginx"
+    # secretName: my-tls-cert
+    # kubernetes.io/tls-acme: "true"

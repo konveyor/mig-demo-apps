@@ -6,6 +6,14 @@ Find all apps in `./apps/` directory.
 
 Follow README.md of each app for installation instructions.
 
+## Konveyor End to End Demo App
+
+The Retail application used to demonstrate all Konveyor projects in an end to end demo.
+
+Find README here : [./apps/e2e-demo/README.md](./apps/e2e-demo/README.md)
+
+Credits : [https://github.com/rromannissen/rhoar-microservices-demo](https://github.com/rromannissen/rhoar-microservices-demo)
+
 ## Sock Shop App
 
 An e-commerce website that sells socks.
@@ -24,7 +32,7 @@ Credits : [https://github.com/instana/robot-shop](https://github.com/instana/rob
 
 ## Parks App
 
-A website that shows popular Historic Sites and National Parks on a map. 
+A website that shows popular Historic Sites and National Parks on a map.
 
 Find README here : [./apps/parks-app/README.md](./apps/parks-app/README.md)
 

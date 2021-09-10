@@ -1,0 +1,14 @@
+apiVersion: v2
+name: gateway-config
+description: Configuration for the gateway service.
+
+type: application
+
+version: 0.1.0
+
+appVersion: 1.16.0
+
+dependencies:
+- name: simple-java-service
+  version: 0.1.0
+  repository: https://rromannissen.github.io/simple-java-service/docs
