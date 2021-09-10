@@ -1,0 +1,48 @@
+quarkus:
+  kubernetes-client:
+    trust-certs: true
+  kubernetes-config:
+    enabled: true
+    config-maps:
+      - inventory-config
+  hibernate-orm:
+    database:
+      generation: drop-and-create
+    sql-load-script: load.sql
+  datasource:
+    db-kind: postgresql
+    username: postgres
+    password: postgres
+    jdbc:
+      url: jdbc:postgresql://postgresql:5432/postgres
+
+  log:
+    level: DEBUG
+    category:
+      "io.konveyor.demo":
+        level: DEBUG
+  jaeger:
+    endpoint: http://jaeger-collector.rhoar.svc:14268/api/traces
+    sampler-type: const
+    sampler-param: 1
+
+"%dev":
+  quarkus:
+    http:
+      port: 8083
+    kubernetes-config:
+      enabled: false
+    datasource:
+      db-kind: h2
+      jdbc:
+        url: jdbc:h2:mem:inventory;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+
+
+"%test":
+  quarkus:
+    kubernetes-config:
+      enabled: false
+    datasource:
+      db-kind: h2
+      jdbc:
+        url: jdbc:h2:mem:inventory;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE

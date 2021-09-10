@@ -1,0 +1,6 @@
+dependencies:
+- name: simple-java-service
+  repository: https://rromannissen.github.io/simple-java-service/docs
+  version: 0.1.0
+digest: sha256:e77ede0439b5beadc9b4867891e88f77481a1ea4c0ccb436c6462be345d7ff95
+generated: "2020-07-16T13:06:01.862736307+02:00"

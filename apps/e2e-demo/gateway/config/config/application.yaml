@@ -1,0 +1,42 @@
+services:
+  orders:
+    url: http://orders:8080/orders
+  inventory:
+    url: http://inventory:8080/products
+  customers:
+    url: http://customers:8080/customers
+
+hystrix:
+  command:
+    ProductsCall:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 2000
+  threadpool:
+    ProductsThreads:
+      coreSize: 20
+      maxQueueSize: 200
+      queueSizeRejectionThreshold: 200
+
+opentracing:
+  jaeger:
+    http-sender:
+      url: http://jaeger-all-in-one-inmemory-collector:14268/api/traces
+  spring:
+    cloud:
+      jdbc:
+        enabled: false
+      feign:
+        enabled: false
+      jms:
+        enabled: false
+      zuul:
+        enabled: false
+      websocket:
+        enabled: false
+      hystrix:
+        strategy:
+          enabled: true
+      async:
+        enabled: false
