@@ -1,9 +1,9 @@
 {
-  "name": "patternfly-seed",
+  "name": "frontend",
   "version": "0.0.2",
-  "description": "An open source build scaffolding utility for web apps.",
-  "repository": "https://github.com/patternfly/patternfly-react-seed.git",
-  "homepage": "https://patternfly-react-seed.surge.sh",
+  "description": "The Retail application used to demonstrate all Konveyor projects in an end to end demo.",
+  "repository": "https://github.com/konveyor/mig-demo-apps.git",
+  "homepage": "https://www.konveyor.io/",
   "license": "MIT",
   "private": true,
   "scripts": {
