@@ -1,4 +1,4 @@
-## Rocket Shop
+## Rocket Chat
 
 ### Deploying to Kubernetes/OpenShift
 
