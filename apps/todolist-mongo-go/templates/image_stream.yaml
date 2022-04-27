@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: List
+items:
+  - kind: ImageStream
+    apiVersion: image.openshift.io/v1
+    metadata:
+      name: todolist-mongo-go
+      namespace: mongo-persistent
+      labels:
+        app: todolist
+    spec: {}
+    status:
+      dockerImageRepository: ''
