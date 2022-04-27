@@ -1,0 +1,11 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: todolist-route
+  namespace: mongo-persistent
+spec:
+  path: "/"
+  to:
+    kind: Service
+    name: todolist
+
