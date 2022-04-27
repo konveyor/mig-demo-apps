@@ -2,17 +2,17 @@
 FROM golang:1.17.8-alpine AS build-env
 RUN mkdir /build
 WORKDIR /build
-COPY *.go .
-COPY go.mod .
-COPY go.sum .
+COPY apps/todolist-mongo-go/*.go .
+COPY apps/todolist-mongo-go/go.mod .
+COPY apps/todolist-mongo-go/go.sum .
 RUN go mod download
 RUN go mod tidy
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -a -installsuffix cgo -o app
 
 FROM scratch
 COPY --from=build-env /build/app /app
-COPY resources/ /resources/
-COPY index.html .
+COPY apps/todolist-mongo-go/resources/ /resources/
+COPY apps/todolist-mongo-go/index.html .
 EXPOSE 8000
 # use entrypoint for debug
 #ENTRYPOINT ["tail", "-f", "/dev/null"]
