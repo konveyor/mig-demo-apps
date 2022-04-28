@@ -26,3 +26,9 @@ endif
 	--platform $(PLATFORMS) \
 	-t $(MANIFEST_IMG)-buildx \
 	.
+
+manifest-docker:
+	@echo "Running $@ target for platforms: $(PLATFORMS)"
+	MANIFEST="$(MANIFEST_IMG)-docker-manifest" \
+	PLATFORM_LIST=$(PLATFORMS) \
+	./build-manifest.sh
