@@ -1,19 +1,22 @@
-#FROM golang:1.17.8-alpine
-FROM ubi8
-USER root
-RUN dnf install -y golang vim
+FROM --platform=$BUILDPLATFORM golang:1.17.8-alpine AS builder
+ARG TARGETOS
+ARG TARGETARCH
+ARG TARGETVARIANT
+ENV GOOS=${TARGETOS} \
+    GOARCH=${TARGETARCH} \
+    GOARM=${TARGETVARIANT}
+RUN mkdir /build
+WORKDIR /build
+COPY *.go .
+COPY go.mod .
+COPY go.sum .
+RUN go mod download
+RUN go mod tidy
+RUN CGO_ENABLED=0 go build -v -a -installsuffix cgo -o app
+
+FROM scratch
+COPY --from=builder /build/app /app
 COPY resources/ /resources/
 COPY index.html .
-COPY app .
-# dev
-#WORKDIR /go/src/github.com/weshayutin/todolist-mariadb-go
-#
-#COPY ./ .
-#
-#RUN chmod -R 777 ./
-#RUN go mod download
-
 EXPOSE 8000
-# use entrypoint for debug
-#ENTRYPOINT ["tail", "-f", "/dev/null"]
 CMD ["./app"]
