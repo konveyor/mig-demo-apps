@@ -1,0 +1,19 @@
+on:
+  push:
+    paths:
+      - "apps/todolist-mariadb-go"
+      - .github/workflows/todolist-mariadb-go.yaml
+  pull_request:
+jobs:
+  build-push-docker:
+    env:
+      REGISTRY: "ghcr.io/konveyor"
+    name: build-push-docker
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "Build and push docker image"
+        uses: actions/checkout@v2
+      - name: "Build and push docker image"
+        run: |
+          cd apps/todolist-mariadb-go
+          REGISTRY=$REGISTRY make manifest-docker
