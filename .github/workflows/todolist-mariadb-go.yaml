@@ -41,4 +41,4 @@ jobs:
     - name: "Build and push docker image"
       run: |
         cd apps/todolist-mariadb-go
-        REGISTRY=$REGISTRY make manifest-docker
+        REGISTRY=$REGISTRY make manifest-buildx
