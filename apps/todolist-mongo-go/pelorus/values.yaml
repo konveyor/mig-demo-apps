@@ -27,7 +27,7 @@ exporters:
       value: DEBUG
     - name: NAMESPACES
       value: mongo-persistent
-    source_ref: $PULL_BASE_REF
+    source_ref: refs/pull/$PULL_NUMBER/head
     source_url: $OPENSHIFT_BUILD_SOURCE
   - app_name: committime-exporter
     source_context_dir: exporters/
@@ -38,7 +38,7 @@ exporters:
       value: DEBUG
     - name: NAMESPACES
       value: mongo-persistent
-    source_ref: $PULL_BASE_REF
+    source_ref: refs/pull/$PULL_NUMBER/head
     source_url: $OPENSHIFT_BUILD_SOURCE
   - app_name: failure-exporter
     exporter_type: failure
@@ -47,5 +47,5 @@ exporters:
     env_from_configmaps:
     - pelorus-config
     - failuretime-config
-    source_ref: $PULL_BASE_REF
+    source_ref: refs/pull/$PULL_NUMBER/head
     source_url: $OPENSHIFT_BUILD_SOURCE
