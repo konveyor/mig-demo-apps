@@ -178,7 +178,7 @@ func GetIncompleteItems(w http.ResponseWriter, r *http.Request) {
 
 func GetTodoItems(completed bool) interface{} {
 	findOptions := options.Find()
-	findOptions.SetLimit(2)
+	findOptions.SetLimit(50)
 
 	var results []*TodoItemModel
 	filter := bson.M{"completed": completed}
