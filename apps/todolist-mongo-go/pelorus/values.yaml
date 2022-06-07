@@ -28,7 +28,7 @@ exporters:
       value: DEBUG
     - name: NAMESPACES
       value: mongo-persistent
-    source_ref: master
+    source_ref: refs/pull/$PULL_NUMBER/head
     source_url: https://github.com/konveyor/pelorus.git
   - app_name: committime-exporter
     exporter_type: committime
@@ -40,5 +40,5 @@ exporters:
       value: DEBUG
     - name: NAMESPACES
       value: mongo-persistent
-    source_ref: master
+    source_ref: refs/pull/$PULL_NUMBER/head
     source_url: https://github.com/konveyor/pelorus.git
