@@ -42,3 +42,14 @@ exporters:
       value: mongo-persistent
     source_ref: master
     source_url: https://github.com/konveyor/pelorus.git
+#@  - app_name: failure-exporter
+#@    exporter_type: failure
+#@    env_from_secrets:
+#@    - github-secret
+#@    extraEnv:
+#@     - name: PROVIDER
+#@       value: github
+#@     - name: PROJECTS
+#@       value: konveyor/mig-demo-apps
+#@    source_ref: master
+#@    source_url: https://github.com/konveyor/pelorus.git
