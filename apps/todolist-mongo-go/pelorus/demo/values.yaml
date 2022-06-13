@@ -1,0 +1,52 @@
+# Default values for deploy.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# to reset password: htpasswd -s -b -n internal changeme
+openshift_prometheus_htpasswd_auth: internal:{SHA}+pvrmeQCmtWmYVOZ57uuITVghrM=
+openshift_prometheus_basic_auth_pass: changeme
+extra_prometheus_hosts:
+
+# Uncomment this if your cluster serves privately signed certificates
+# custom_ca: true
+
+deployment:
+  labels:
+    app.kubernetes.io/component: prometheus
+    app.kubernetes.io/name: pelorus
+    app.kubernetes.io/version: v0.33.0
+
+exporters:
+  instances:
+  - app_name: deploytime-exporter
+    exporter_type: deploytime
+    source_context_dir: exporters/
+    extraEnv:
+    - name: APP_FILE
+      value: deploytime/app.py
+    - name: LOG_LEVEL
+      value: DEBUG
+    - name: NAMESPACES
+      value: mongo-persistent
+    image_name: quay.io/pelorus/deploytime-exporter
+  - app_name: committime-exporter
+    exporter_type: committime
+    source_context_dir: exporters/
+    extraEnv:
+    - name: APP_FILE
+      value: committime/app.py
+    - name: LOG_LEVEL
+      value: DEBUG
+    - name: NAMESPACES
+      value: mongo-persistent
+    image_name: quay.io/pelorus/committime-exporter
+#@  - app_name: failure-exporter
+#@    exporter_type: failure
+#@    env_from_secrets:
+#@    - github-secret
+#@    extraEnv:
+#@     - name: PROVIDER
+#@       value: github
+#@     - name: PROJECTS
+#@       value: weshayutin/mig-demo-apps
+#@    image_name: quay.io/pelorus/failure-exporter
