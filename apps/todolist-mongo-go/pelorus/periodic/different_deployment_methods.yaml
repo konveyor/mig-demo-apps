@@ -1,0 +1,74 @@
+# Config file for Pelorus project
+# https://github.com/konveyor/pelorus/
+
+# Deploy only one exporter with multiple deployment methods.
+#
+
+openshift_prometheus_htpasswd_auth: internal:{SHA}+pvrmeQCmtWmYVOZ57uuITVghrM=
+openshift_prometheus_basic_auth_pass: changeme
+extra_prometheus_hosts:
+
+# Uncomment this if your cluster serves privately signed certificates
+# custom_ca: true
+
+deployment:
+  labels:
+    app.kubernetes.io/component: prometheus
+    app.kubernetes.io/name: pelorus
+    app.kubernetes.io/version: v0.33.0
+
+exporters:
+  instances:
+  - app_name: deploytime-exporter
+    exporter_type: deploytime
+    extraEnv:
+    - name: NAMESPACES
+      value: mongo-persistent
+
+  - app_name: committime-exporter
+    exporter_type: committime
+    extraEnv:
+    - name: NAMESPACES
+      value: mongo-persistent
+
+  - app_name: deploytime-exporter-latest-custom-imagetag
+    exporter_type: deploytime
+    image_tag: latest
+    extraEnv:
+    - name: NAMESPACES
+      value: mongo-persistent
+
+  - app_name: committime-exporter-latest-custom-imagetag
+    exporter_type: committime
+    image_tag: latest
+    extraEnv:
+    - name: NAMESPACES
+      value: mongo-persistent
+
+  - app_name: deploytime-exporter-git-custom-url
+    exporter_type: deploytime
+    source_url: https://github.com/konveyor/pelorus.git
+    extraEnv:
+    - name: NAMESPACES
+      value: mongo-persistent
+
+  - app_name: committime-exporter-git-custom-url
+    exporter_type: committime
+    source_url: https://github.com/konveyor/pelorus.git
+    extraEnv:
+    - name: NAMESPACES
+      value: mongo-persistent
+
+  - app_name: deploytime-exporter-git-custom-source-ref
+    exporter_type: deploytime
+    source_ref: master
+    extraEnv:
+    - name: NAMESPACES
+      value: mongo-persistent
+
+  - app_name: committime-exporter-git-custom-source-ref
+    exporter_type: committime
+    source_ref: master
+    extraEnv:
+    - name: NAMESPACES
+      value: mongo-persistent
