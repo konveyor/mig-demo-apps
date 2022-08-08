@@ -37,7 +37,39 @@ exporters:
       value: DEBUG
     - name: NAMESPACES
       value: mongo-persistent
-
+#gitlab-committime@  - app_name: gitlab-committime-exporter
+#gitlab-committime@    exporter_type: committime
+#gitlab-committime@    env_from_secrets:
+#gitlab-committime@    - gitlab-secret
+#gitlab-committime@    extraEnv:
+#gitlab-committime@    - name: LOG_LEVEL
+#gitlab-committime@      value: DEBUG
+#gitlab-committime@    - name: GIT_PROVIDER
+#gitlab-committime@      value: gitlab
+#gitlab-committime@    - name: NAMESPACES
+#gitlab-committime@      value: gitlab-binary
+#bitbucket-committime@  - app_name: bitbucket-committime-exporter
+#bitbucket-committime@    exporter_type: committime
+#bitbucket-committime@    env_from_secrets:
+#bitbucket-committime@    - bitbucket-secret
+#bitbucket-committime@    extraEnv:
+#bitbucket-committime@    - name: LOG_LEVEL
+#bitbucket-committime@      value: DEBUG
+#bitbucket-committime@    - name: GIT_PROVIDER
+#bitbucket-committime@      value: bitbucket
+#bitbucket-committime@    - name: NAMESPACES
+#bitbucket-committime@      value: bitbucket-binary
+#gitea-committime@  - app_name: gitea-committime-exporter
+#gitea-committime@    exporter_type: committime
+#gitea-committime@    env_from_secrets:
+#gitea-committime@    - gitea-secret
+#gitea-committime@    extraEnv:
+#gitea-committime@    - name: LOG_LEVEL
+#gitea-committime@      value: DEBUG
+#gitea-committime@    - name: GIT_PROVIDER
+#gitea-committime@      value: gitea
+#gitea-committime@    - name: NAMESPACES
+#gitea-committime@      value: gitea-binary
 #@  - app_name: failure-exporter
 #@    exporter_type: failure
 #@    image_tag: latest
