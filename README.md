@@ -92,3 +92,6 @@ A sample minio deployment that can be used as an S3 backing store for MTC migrat
 While we recommend to use MCG/NooBaa for on-premise Object Storage needs, we are including other possible Object Storage for demo/testing purposes.
 
 Find README here : [./infra/minio/README.md](./infra/minio/README.md)
+
+## Code of Conduct
+Refer to Konveyor's Code of Conduct [here](https://github.com/konveyor/community/blob/main/CODE_OF_CONDUCT.md).
