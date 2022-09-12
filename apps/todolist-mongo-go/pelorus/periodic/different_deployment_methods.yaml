@@ -4,18 +4,23 @@
 # Deploy only one exporter with multiple deployment methods.
 #
 
+# to reset password: htpasswd -s -b -n internal changeme
 openshift_prometheus_htpasswd_auth: internal:{SHA}+pvrmeQCmtWmYVOZ57uuITVghrM=
 openshift_prometheus_basic_auth_pass: changeme
-extra_prometheus_hosts:
+#extra_prometheus_hosts: EXTRA_PROMETHEUS_HOSTS
 
 # Uncomment this if your cluster serves privately signed certificates
 # custom_ca: true
 
-deployment:
-  labels:
-    app.kubernetes.io/component: prometheus
-    app.kubernetes.io/name: pelorus
-    app.kubernetes.io/version: v0.33.0
+#thanos_bucket_name: THANOS_BUCKET_NAME
+#bucket_access_point: BUCKET_ACCESS_POINT
+#bucket_access_key: BUCKET_ACCESS_KEY
+#bucket_secret_access_key: BUCKET_SECRET_ACCESS_KEY
+
+# PVC for prometheus
+#prometheus_storage: PROMETHEUS_STORAGE
+#prometheus_storage_pvc_capacity: PROMETHEUS_STORAGE_PVC_CAPACITY
+#prometheus_storage_pvc_storageclass: PROMETHEUS_STORAGE_PVC_STORAGECLASS
 
 exporters:
   instances:

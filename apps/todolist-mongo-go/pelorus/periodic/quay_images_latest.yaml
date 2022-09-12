@@ -7,16 +7,20 @@
 
 openshift_prometheus_htpasswd_auth: internal:{SHA}+pvrmeQCmtWmYVOZ57uuITVghrM=
 openshift_prometheus_basic_auth_pass: changeme
-extra_prometheus_hosts:
+#extra_prometheus_hosts: EXTRA_PROMETHEUS_HOSTS
 
 # Uncomment this if your cluster serves privately signed certificates
 # custom_ca: true
 
-deployment:
-  labels:
-    app.kubernetes.io/component: prometheus
-    app.kubernetes.io/name: pelorus
-    app.kubernetes.io/version: v0.33.0
+#thanos_bucket_name: THANOS_BUCKET_NAME
+#bucket_access_point: BUCKET_ACCESS_POINT
+#bucket_access_key: BUCKET_ACCESS_KEY
+#bucket_secret_access_key: BUCKET_SECRET_ACCESS_KEY
+
+# PVC for prometheus
+#prometheus_storage: PROMETHEUS_STORAGE
+#prometheus_storage_pvc_capacity: PROMETHEUS_STORAGE_PVC_CAPACITY
+#prometheus_storage_pvc_storageclass: PROMETHEUS_STORAGE_PVC_STORAGECLASS
 
 exporters:
   instances:
@@ -39,6 +43,7 @@ exporters:
       value: mongo-persistent
 #gitlab-committime@  - app_name: gitlab-committime-exporter
 #gitlab-committime@    exporter_type: committime
+#gitlab-committime@    image_tag: latest
 #gitlab-committime@    env_from_secrets:
 #gitlab-committime@    - gitlab-secret
 #gitlab-committime@    extraEnv:
@@ -50,6 +55,7 @@ exporters:
 #gitlab-committime@      value: gitlab-binary
 #bitbucket-committime@  - app_name: bitbucket-committime-exporter
 #bitbucket-committime@    exporter_type: committime
+#bitbucket-committime@    image_tag: latest
 #bitbucket-committime@    env_from_secrets:
 #bitbucket-committime@    - bitbucket-secret
 #bitbucket-committime@    extraEnv:
@@ -61,6 +67,7 @@ exporters:
 #bitbucket-committime@      value: bitbucket-binary
 #gitea-committime@  - app_name: gitea-committime-exporter
 #gitea-committime@    exporter_type: committime
+#gitea-committime@    image_tag: latest
 #gitea-committime@    env_from_secrets:
 #gitea-committime@    - gitea-secret
 #gitea-committime@    extraEnv:
@@ -70,6 +77,36 @@ exporters:
 #gitea-committime@      value: gitea
 #gitea-committime@    - name: NAMESPACES
 #gitea-committime@      value: gitea-binary
+#jira-failure@  - app_name: jira-failure-exporter
+#jira-failure@    exporter_type: failure
+#jira-failure@    image_tag: latest
+#jira-failure@    env_from_secrets:
+#jira-failure@    - jira-secret
+#jira-failure@    extraEnv:
+#jira-failure@    - name: LOG_LEVEL
+#jira-failure@      value: DEBUG
+#jira-failure@    - name: SERVER
+#jira-failure@      value: https://pelorustest.atlassian.net
+#jira-failure@    - name: PROJECTS
+#jira-failure@      value: todolist-mongo
+#jira-custom-failure@  - app_name: jira-custom-failure-exporter
+#jira-custom-failure@    exporter_type: failure
+#jira-custom-failure@    image_tag: latest
+#jira-custom-failure@    env_from_secrets:
+#jira-custom-failure@    - jira-secret
+#jira-custom-failure@    extraEnv:
+#jira-custom-failure@    - name: LOG_LEVEL
+#jira-custom-failure@      value: DEBUG
+#jira-custom-failure@    - name: SERVER
+#jira-custom-failure@      value: https://pelorustest.atlassian.net
+#jira-custom-failure@    - name: JIRA_JQL_SEARCH_QUERY
+#jira-custom-failure@      value: type in ("Bug") AND priority in ("Low") AND project in ("FIRST")
+#jira-custom-failure@    - name: JIRA_RESOLVED_STATUS
+#jira-custom-failure@      value: In Progress
+#jira-custom-failure@    - name: APP_LABEL
+#jira-custom-failure@      value: my.app.label/name
+#jira-custom-failure@    - name: CORRESPONDING_ISSUE
+#jira-custom-failure@      value: https://pelorustest.atlassian.net/jira/core/projects/FIRST/board?selectedIssue=FIRST-14
 #@  - app_name: failure-exporter
 #@    exporter_type: failure
 #@    image_tag: latest
