@@ -41,10 +41,10 @@ import (
 
 // remote connection
 
-//var db, _ = gorm.Open("mysql", "changeme:changeme@(mysql:3306)/todolist?charset=utf8&parseTime=True")
+var db, _ = gorm.Open("mysql", "changeme:changeme@(mysql:3306)/todolist?charset=utf8&parseTime=True")
 
 // local connection
-var db, _ = gorm.Open("mysql", "root:root@tcp/todolist?charset=utf8&parseTime=True")
+//var db, _ = gorm.Open("mysql", "root:root@tcp/todolist?charset=utf8&parseTime=True")
 
 type TodoItemModel struct {
 	Id          int `gorm:"primary_key"`
@@ -169,11 +169,13 @@ func main() {
 	// if directory or volume is not mounted, do not exit
 	if err != nil {
 		fmt.Println("Failed to create logfile" + "logrus.txt")
+		logrus.Info("Failed: log file /tmp/log/todoapp/app.log create failed")
 		f.Close()
 	} else {
 		defer f.Close()
 		multi := io.MultiWriter(f, os.Stdout)
 		logrus.SetOutput(multi)
+		logrus.Info("Success: Attached volume and redirected logs to /tmp/log/todoapp/app.log")
 	}
 
 	defer db.Close()
