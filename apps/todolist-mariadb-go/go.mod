@@ -12,5 +12,6 @@ require (
 
 require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/t-tomalak/logrus-easy-formatter v0.0.0-20190827215021-c074f06c5816 // indirect
 	golang.org/x/sys v0.0.0-20200323222414-85ca7c5b95cd // indirect
 )
