@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<ruleset id="corporate-configuration"
+         xmlns="http://windup.jboss.org/schema/jboss-ruleset"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://windup.jboss.org/schema/jboss-ruleset http://windup.jboss.org/schema/jboss-ruleset/windup-jboss-ruleset.xsd">
+    <metadata>
+        <description>
+            This ruleset provides rules related to the corporate configuration frameworks.
+        </description>
+        <dependencies>
+          <addon id="org.jboss.windup.rules,windup-rules-javaee,3.0.0.Final"/>
+          <addon id="org.jboss.windup.rules,windup-rules-java,3.0.0.Final"/>
+        </dependencies>
+        <sourceTechnology id="java"/>
+        <sourceTechnology id="java-ee"/>
+        <targetTechnology id="cloud-readiness"/>
+        <tag>configuration</tag>
+    </metadata>
+    <rules>
+        <rule id="corporate-config-01000" xmlns="http://windup.jboss.org/schema/jboss-ruleset">
+            <when>
+                <javaclass references="io.konveyor.demo.config.ApplicationConfiguration">
+                    <location>VARIABLE_DECLARATION</location>
+                </javaclass>
+            </when>
+            <perform>
+                <hint title="Legacy configuration with io.konveyor.demo.config.ApplicationConfiguration" effort="1" category-id="cloud-mandatory">
+                    <message>
+                        The legacy ApplicationConfiguration class is being used in this application. This is discouraged by the migration
+                        guidelines, and should be replaced by a more standard approach using Spring's @PropertySource annotation and Environment class:
+
+
+                        ```java
+                        @PropertySource("classpath:persistence.properties")
+                        public class PersistenceConfig {
+                          @Autowired
+                          private Environment env;
+
+                          @Bean
+                          public DataSource dataSource() {
+                            final DriverManagerDataSource dataSource = new DriverManagerDataSource();
+                            dataSource.setDriverClassName(env.getProperty("jdbc.driverClassName"));
+                            dataSource.setUrl(env.getProperty("jdbc.url"));
+                            dataSource.setUsername(env.getProperty("jdbc.user"));
+                            dataSource.setPassword(env.getProperty("jdbc.password"));
+
+                            return dataSource;
+                          }
+                        }
+                        ```
+
+
+
+                        This allows externalizing the configuration in Kubernetes by injecting it as a ConfigMap or a Secret in the lib directory from the
+                        container running the Tomcat instance. Please take into account that, given the way Tomcat classloader works, any properties files packaged within the WAR artifact
+                        will take precedence over the files available in the lib directory. It would be advisable to remove these files on the WAR to be deployed in Kubernetes.
+                        A good way to do this would be by configuring a kubernetes profile in Maven that excludes the properties files:
+
+
+                        ```xml
+                        <profiles>
+                      		<profile>
+                      			<id>local</id>
+                      			<activation>
+                              		<activeByDefault>true</activeByDefault>
+                          		</activation>
+                      		</profile>
+                      		<profile>
+                      			<id>kubernetes</id>
+                      			<activation />
+                      			<build>
+                          		<resources>
+                            		<resource>
+                              		<directory>src/main/resources</directory>
+                              		<excludes>
+                                		<exclude>**/*.properties</exclude>
+                              		</excludes>
+                            		</resource>
+                          		</resources>
+                        		</build>
+                      		</profile>
+                      	</profiles>
+                        ```
+                        
+                        This would ensure that the properties files that the application uses are the ones inside the ConfigMap or Secret objects to be injected in the Tomcat lib directory at deployment time.
+                    </message>
+                    <link title="Spring Documentation - PropertySource javadoc" href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/PropertySource.html"/>
+                    <link title="Mkyong - Spring @PropertySource example" href="https://mkyong.com/spring/spring-propertysources-example/"/>
+                    <link title="Baeldung - Properties with Spring and Spring Boot" href="https://www.baeldung.com/properties-with-spring" />
+                    <tag>configuration</tag>
+                </hint>
+            </perform>
+        </rule>
+      </rules>
+</ruleset>

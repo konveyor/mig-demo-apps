@@ -1,0 +1,7 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.applicationName }}-nginx-config
+data:
+{{ (.Files.Glob "nginx-config/*").AsConfig | indent 2 }}

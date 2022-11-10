@@ -1,0 +1,25 @@
+applicationName: gateway
+targetEnvironment: dev
+version: "1.0.0"
+port: 8080
+targetPort: 8080
+routes: []
+deploymentStrategy:
+  type: RollingUpdate
+  rollingMaxSurge: 25%
+  rollingMaxUnavailable: 20%
+replicaCount: 1
+health:
+  livenessEndpoint: /actuator/health
+  readinessEndpoint: /actuator/health
+  probeDelay: 5
+  probePeriod: 10
+  probeTimeout: 2
+imageURL: "quay.io/openshiftlabs/app-mod-gateway:1.1"
+env: []
+
+# The hostname or IP of the various services
+customersHost: customers
+customersApp: customers-tomcat-0.0.1-SNAPSHOT
+ordersHost: orders
+inventoryHost: inventory

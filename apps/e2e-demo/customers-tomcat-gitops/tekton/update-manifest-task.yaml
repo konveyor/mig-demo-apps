@@ -1,0 +1,53 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: update-manifest
+spec:
+  description: >-
+    This task updates the manifest for the current application to point to the image tag created with the short commit.
+  workspaces:
+    - name: source
+  params:
+    - name: short-commit
+      description: Short commit id used to tag the built image.
+      type: string
+    - name: target-branch
+      description: Target branch to push to
+      type: string
+      default: "master"
+    - name: git_user_name
+      type: string
+      description: Git user name for performing the push operation.
+      default: "Tekton Pipeline"
+    - name: git_user_email
+      type: string
+      description: Git user email for performing the push operation.
+      default: "tekton@tekton.com"
+    - name: config-subdirectory
+      description: Subdirectory in which the configuration is stored.
+      type: string
+    - name: git-root-directory
+      description: Root directory for the git repository.
+      type: string
+  steps:
+    - name: git
+      image: alpine/git:latest
+      workingDir: $(workspaces.source.path)/$(params.git-root-directory)
+      script: |
+        # Setting up the git config.
+        git config --global user.email "$(params.git_user_email)"
+        git config --global user.name "$(params.git_user_name)"
+
+        # Checkout target branch to avoid the detached HEAD state
+
+        git checkout $(params.target-branch)
+
+        # Set to the short commit value passed as parameter.
+        # Notice the enclosing " to keep it as a string in the resulting YAML.
+        SHORT_COMMIT_HASH=\"$(params.short-commit)\"
+
+        sed -i "/^\([[:space:]]*version: \).*/s//\1$SHORT_COMMIT_HASH/" $(params.config-subdirectory)/values.yaml
+
+        git add --a
+        git commit -m "Automatically updated manifest to point to image tag $SHORT_COMMIT_HASH"
+        git push origin $(params.target-branch)

@@ -1,0 +1,19 @@
+applicationName: inventory
+targetEnvironment: dev
+version: "1.0.0"
+port: 8080
+targetPort: 8080
+routes: []
+deploymentStrategy:
+  type: RollingUpdate
+  rollingMaxSurge: 25%
+  rollingMaxUnavailable: 20%
+replicaCount: 1
+health:
+  livenessEndpoint: /q/health/live
+  readinessEndpoint: /q/health/ready
+  probeDelay: 5
+  probePeriod: 10
+  probeTimeout: 2
+imageURL: "quay.io/openshiftlabs/app-mod-inventory:1.0"
+env: []

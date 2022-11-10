@@ -1,0 +1,14 @@
+# Default values for argoapps.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+user: user1
+
+# Password for the customer Database
+customerDatabase:
+  hostname: oracle-db-database
+  user: customer
+  password: ""
+
+# Hostname or IP of the customers service
+customersHost: customers

@@ -14,12 +14,14 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.eclipse.microprofile.opentracing.Traced;
 import org.jboss.logging.Logger;
 import io.konveyor.demo.inventory.exception.ResourceNotFoundException;
 import io.konveyor.demo.inventory.model.Product;
 import io.konveyor.demo.inventory.service.IProductService;
 
 import io.opentracing.Scope;
+import io.opentracing.Span;
 import io.opentracing.Tracer;
 import io.quarkus.panache.common.Page;
 import io.quarkus.panache.common.Sort;
@@ -39,20 +41,14 @@ public class ProductController {
 	@GET
     @Path("/{id}")
     @Produces({ MediaType.APPLICATION_JSON })
+	@Traced
     public Product getById(@PathParam("id") Long id) {
 		Product p;
-		/* Use a try-with-resources block to ensure that the active span
-		 * gets closed even in the case of exception.*/
-		try (Scope scope = tracer
-				.buildSpan("getById")
-				.withTag("layer", "Controller")
-				.startActive(true)){
-			logger.debug("Entering ProductController.getById()");
-			p = productService.findById(id);
-			if (p == null) {
-				throw new ResourceNotFoundException("Product not found");
-			}
-		}	
+		logger.debug("Entering ProductController.getById()");
+		p = productService.findById(id);
+		if (p == null) {
+			logger.error("Product not found");
+		}
 		return p;    
     }
 	

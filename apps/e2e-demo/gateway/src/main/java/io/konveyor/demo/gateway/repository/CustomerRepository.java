@@ -3,7 +3,6 @@ package io.konveyor.demo.gateway.repository;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.konveyor.demo.gateway.model.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -17,6 +16,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 
+import io.konveyor.demo.gateway.model.Customer;
+import io.konveyor.demo.util.PaginatedResponse;
 import io.opentracing.Span;
 import io.opentracing.Tracer;
 import lombok.extern.slf4j.Slf4j;
@@ -65,14 +66,14 @@ public class CustomerRepository extends GenericRepository{
 				.queryParam("page", pageable.getPageNumber())
 				.queryParam("size", pageable.getPageSize())
 				.queryParam("sort", getSortString(pageable));
-		ResponseEntity<List<Customer>> responseEntity = 
+		ResponseEntity<PaginatedResponse<Customer>> responseEntity = 
 				  restTemplate.exchange(
 						  builder.toUriString(),
 						  HttpMethod.GET,
 						  null,
-						  new ParameterizedTypeReference<List<Customer>>() {}
+						  new ParameterizedTypeReference<PaginatedResponse<Customer>>() {}
 				  );
-		List<Customer> customers = responseEntity.getBody();
+		List<Customer> customers = responseEntity.getBody().getContent();
 		span.finish();
 		return customers;
 	}

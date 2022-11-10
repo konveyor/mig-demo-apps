@@ -1,0 +1,22 @@
+# Default values for cicd.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+demoNamespace: retail
+cicdNamespace: cicd
+
+targetRegistry: image-registry.openshift-image-registry.svc:5000
+
+namespacePermissions:
+  user: user1
+  role: edit
+
+repo:
+  url: http://gitea.gitea.svc:3000/user1/app-mod-projects
+  tag: main
+  user: user1
+  password: ""
+
+pipelineStorage:
+  pvcSize: 2Gi
+  storageClassName: ""

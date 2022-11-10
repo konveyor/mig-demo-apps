@@ -1,0 +1,21 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: inventory
+  namespace: retail-{{ .Values.user }}
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: http://gitea.gitea.svc:3000/{{ .Values.user }}/modern-app-dev.git
+    targetRevision: main
+    path: helm/inventory
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: retail-{{ .Values.user }}
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true

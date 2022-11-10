@@ -1,0 +1,21 @@
+quarkus:
+  kubernetes-client:
+    trust-certs: true
+  kubernetes-config:
+    enabled: true
+    config-maps:
+    - inventory-config
+  hibernate-orm:
+    database:
+      generation: drop-and-create
+    sql-load-script: load.sql
+  datasource:
+    db-kind: postgresql
+    jdbc:
+      url: jdbc:postgresql://postgresql-inventory:5432/inventory
+  log:
+    level: INFO
+  jaeger:
+    endpoint: http://jaeger-all-in-one-inmemory-collector:14268/api/traces
+    sampler-type: const
+    sampler-param: 1

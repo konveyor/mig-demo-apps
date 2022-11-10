@@ -1,0 +1,82 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: customers-deployment-pipeline
+spec:
+  params:
+  - name: git-url
+  - name: git-branch
+    default: main
+  - name: app-subdir
+  - name: target-namespace
+    default: retail
+  - name: target-registry
+    default: image-registry.openshift-image-registry.svc:5000
+  workspaces:
+    - name: ws
+  tasks:
+    - name: clone-repository
+      taskRef:
+        name: git-clone
+      params:
+      - name: url
+        value: $(params.git-url)
+      - name: revision
+        value: $(params.git-branch)
+      - name: subdirectory
+        value: source
+      - name: deleteExisting
+        value: "true"
+      workspaces:
+        - name: output
+          workspace: ws
+    - name: build-artifact
+      runAfter:
+        - clone-repository
+      taskRef:
+        name: maven-with-subdir
+      params:
+      - name: GOALS
+        value:
+          - "package"
+          - "-P kubernetes"
+      - name: subdirectory
+        value: source/$(params.app-subdir)
+      workspaces:
+        - name: source
+          workspace: ws
+    - name: build-image
+      runAfter:
+        - build-artifact
+      taskRef:
+        name: buildah
+        kind: ClusterTask
+      params:
+      - name: IMAGE
+        value: $(params.target-registry)/$(params.target-namespace)/$(params.app-subdir):$(tasks.clone-repository.results.short-commit)
+      - name: DOCKERFILE
+        value: ./source/$(params.app-subdir)/Dockerfile
+      - name: CONTEXT
+        value: ./source/$(params.app-subdir)
+      - name: TLSVERIFY
+        value: "false"
+      workspaces:
+        - name: source
+          workspace: ws
+    - name: update-manifest-and-push
+      runAfter:
+        - build-image
+      taskRef:
+        name: update-manifest
+      params:
+      - name: short-commit
+        value: $(tasks.clone-repository.results.short-commit)
+      - name: target-branch
+        value: $(params.git-branch)
+      - name: config-subdirectory
+        value: $(params.app-subdir)/helm
+      - name: git-root-directory
+        value: source
+      workspaces:
+        - name: source
+          workspace: ws
