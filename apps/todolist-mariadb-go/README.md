@@ -95,3 +95,5 @@ MariaDB [todolist]>
 ![gnome-shell-screenshot-edww3e](https://user-images.githubusercontent.com/138787/160934609-a77798a1-3986-46a0-a334-a8b53ceccb7d.png)
 
 
+### New Features:
+* There is a new api endpoint to to display the log file, not the stdout.  This will help to confirm the volume attached to the todolist container is restored properly.
