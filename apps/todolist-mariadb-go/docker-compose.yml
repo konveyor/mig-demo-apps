@@ -1,0 +1,30 @@
+version: "3.8"
+services: 
+  mysql:
+    image: mariadb:latest
+    restart: always
+    ports:
+      - 3306:3306
+    volumes:
+      - dbvol:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: todolist
+      MYSQL_USER: changeme
+      MYSQL_PASSWORD: changeme
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      - mysql
+  todolist:
+    image: quay.io/konveyor/todolist-mariadb-go:v2_4
+    restart: always
+    ports:
+      - 8000:8000
+    volumes:
+      - applog:/tmp/log/todoapp/
+    networks:
+      - mysql
+volumes:
+  wpdbvol: {}
+  applog: {}
+networks:
+  mysql: {}
