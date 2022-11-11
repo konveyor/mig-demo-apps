@@ -4,7 +4,22 @@
 https://github.com/sdil/learning/blob/master/go/todolist-mysql-go/todolist.go
 
 
-## Local Setup
+## Local Setup ( Easy )
+
+The right OS:
+```
+sudo dnf install podman-compose
+podman-compose up -d
+```
+
+The wrong OS:
+```
+brew install podman-compose
+podman-compose up -d
+```
+
+
+## Local Setup ( Harder )
 
 * Get mariadb running
 

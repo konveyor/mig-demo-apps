@@ -39,12 +39,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// remote connection
-
 var db, _ = gorm.Open("mysql", "changeme:changeme@(mysql:3306)/todolist?charset=utf8&parseTime=True")
-
-// local connection
-//var db, _ = gorm.Open("mysql", "root:root@tcp/todolist?charset=utf8&parseTime=True")
 
 type TodoItemModel struct {
 	Id          int `gorm:"primary_key"`
@@ -160,6 +155,12 @@ func prepopulate() {
 
 }
 
+func GetLogFile(w http.ResponseWriter, r *http.Request) {
+	// if file not found we simply get a 404
+	filename := "/tmp/log/todoapp/app.log"
+	http.ServeFile(w, r, filename)
+}
+
 func main() {
 	// logging to volume
 	if _, err := os.Stat("/tmp/log/todoapp"); os.IsNotExist(err) {
@@ -194,6 +195,7 @@ func main() {
 	router.PathPrefix("/resources/").Handler(http.StripPrefix("/resources/", fs))
 	router.HandleFunc("/", Home).Methods("GET")
 	router.HandleFunc("/healthz", Healthz).Methods("GET")
+	router.HandleFunc("/log", GetLogFile).Methods("GET")
 	router.HandleFunc("/todo-completed", GetCompletedItems).Methods("GET")
 	router.HandleFunc("/todo-incomplete", GetIncompleteItems).Methods("GET")
 	router.HandleFunc("/todo", CreateItem).Methods("POST")
