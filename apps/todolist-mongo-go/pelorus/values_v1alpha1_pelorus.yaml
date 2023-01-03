@@ -1,0 +1,116 @@
+apiVersion: charts.pelorus.konveyor.io/v1alpha1
+kind: Pelorus
+metadata:
+  name: pelorus-sample
+spec:
+  # Default values copied from <project_dir>/helm-charts/pelorus/values.yaml
+  exporters:
+    global: {}
+    instances:
+      - app_name: deploytime-exporter
+        exporter_type: deploytime
+        extraEnv:
+          - name: LOG_LEVEL
+            value: DEBUG
+          - name: NAMESPACES
+            value: mongo-persistent
+        source_ref: master
+        source_url: https://github.com/konveyor/pelorus.git
+      - app_name: committime-exporter
+        exporter_type: committime
+        extraEnv:
+          - name: LOG_LEVEL
+            value: DEBUG
+          - name: NAMESPACES
+            value: mongo-persistent
+        source_ref: master
+        source_url: https://github.com/konveyor/pelorus.git
+#gitlab-committime@      - app_name: gitlab-committime-exporter
+#gitlab-committime@        exporter_type: committime
+#gitlab-committime@        env_from_secrets:
+#gitlab-committime@          - gitlab-secret
+#gitlab-committime@        extraEnv:
+#gitlab-committime@          - name: LOG_LEVEL
+#gitlab-committime@            value: DEBUG
+#gitlab-committime@          - name: GIT_PROVIDER
+#gitlab-committime@            value: gitlab
+#gitlab-committime@          - name: NAMESPACES
+#gitlab-committime@            value: gitlab-binary
+#gitlab-committime@        source_ref: master
+#gitlab-committime@        source_url: https://github.com/konveyor/pelorus.git
+#bitbucket-committime@      - app_name: bitbucket-committime-exporter
+#bitbucket-committime@        exporter_type: committime
+#bitbucket-committime@        env_from_secrets:
+#bitbucket-committime@          - bitbucket-secret
+#bitbucket-committime@        extraEnv:
+#bitbucket-committime@          - name: LOG_LEVEL
+#bitbucket-committime@            value: DEBUG
+#bitbucket-committime@          - name: GIT_PROVIDER
+#bitbucket-committime@            value: bitbucket
+#bitbucket-committime@          - name: NAMESPACES
+#bitbucket-committime@            value: bitbucket-binary
+#bitbucket-committime@        source_ref: master
+#bitbucket-committime@        source_url: https://github.com/konveyor/pelorus.git
+#gitea-committime@      - app_name: gitea-committime-exporter
+#gitea-committime@        exporter_type: committime
+#gitea-committime@        env_from_secrets:
+#gitea-committime@          - gitea-secret
+#gitea-committime@        extraEnv:
+#gitea-committime@          - name: LOG_LEVEL
+#gitea-committime@            value: DEBUG
+#gitea-committime@          - name: GIT_PROVIDER
+#gitea-committime@            value: gitea
+#gitea-committime@          - name: NAMESPACES
+#gitea-committime@            value: gitea-binary
+#gitea-committime@        source_ref: master
+#gitea-committime@        source_url: https://github.com/konveyor/pelorus.git
+#jira-failure@      - app_name: jira-failure-exporter
+#jira-failure@        exporter_type: failure
+#jira-failure@        env_from_secrets:
+#jira-failure@          - jira-secret
+#jira-failure@        extraEnv:
+#jira-failure@          - name: LOG_LEVEL
+#jira-failure@            value: DEBUG
+#jira-failure@          - name: SERVER
+#jira-failure@            value: https://pelorustest.atlassian.net
+#jira-failure@          - name: PROJECTS
+#jira-failure@            value: todolist-mongo
+#jira-failure@        source_ref: master
+#jira-failure@        source_url: https://github.com/konveyor/pelorus.git
+#jira-custom-failure@      - app_name: jira-custom-failure-exporter
+#jira-custom-failure@        exporter_type: failure
+#jira-custom-failure@        env_from_secrets:
+#jira-custom-failure@          - jira-secret
+#jira-custom-failure@        extraEnv:
+#jira-custom-failure@          - name: LOG_LEVEL
+#jira-custom-failure@            value: DEBUG
+#jira-custom-failure@          - name: SERVER
+#jira-custom-failure@            value: https://pelorustest.atlassian.net
+#jira-custom-failure@          - name: JIRA_JQL_SEARCH_QUERY
+#jira-custom-failure@            value: type in ("Bug") AND priority in ("Low") AND project in ("FIRST")
+#jira-custom-failure@          - name: JIRA_RESOLVED_STATUS
+#jira-custom-failure@            value: In Progress
+#jira-custom-failure@          - name: APP_LABEL
+#jira-custom-failure@            value: my.app.label/name
+#jira-custom-failure@          - name: CORRESPONDING_ISSUE
+#jira-custom-failure@            value: https://pelorustest.atlassian.net/jira/core/projects/FIRST/board?selectedIssue=FIRST-14
+#jira-custom-failure@        source_ref: master
+#jira-custom-failure@        source_url: https://github.com/konveyor/pelorus.git
+#@      - app_name: failure-exporter
+#@        exporter_type: failure
+#@        env_from_secrets:
+#@          - github-secret
+#@        extraEnv:
+#@          - name: LOG_LEVEL
+#@            value: DEBUG
+#@          - name: PROVIDER
+#@            value: github
+#@          - name: PROJECTS
+#@            value: konveyor/mig-demo-apps
+#@        source_ref: master
+#@        source_url: https://github.com/konveyor/pelorus.git
+  extra_prometheus_hosts: null
+  openshift_prometheus_basic_auth_pass: changeme
+  openshift_prometheus_htpasswd_auth: internal:{SHA}+pvrmeQCmtWmYVOZ57uuITVghrM=
+  
+  
