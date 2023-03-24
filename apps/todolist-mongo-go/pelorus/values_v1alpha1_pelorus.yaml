@@ -64,6 +64,19 @@ spec:
 #gitea-committime@            value: gitea-binary
 #gitea-committime@        source_ref: master
 #gitea-committime@        source_url: https://github.com/dora-metrics/pelorus.git
+#azure-devops-committime@      - app_name: azure-devops-committime-exporter
+#azure-devops-committime@        exporter_type: committime
+#azure-devops-committime@        env_from_secrets:
+#azure-devops-committime@          - azure-devops-secret
+#azure-devops-committime@        extraEnv:
+#azure-devops-committime@          - name: LOG_LEVEL
+#azure-devops-committime@            value: DEBUG
+#azure-devops-committime@          - name: GIT_PROVIDER
+#azure-devops-committime@            value: azure-devops
+#azure-devops-committime@          - name: NAMESPACES
+#azure-devops-committime@            value: azure-devops-binary
+#azure-devops-committime@        source_ref: master
+#azure-devops-committime@        source_url: https://github.com/dora-metrics/pelorus.git
 #jira-failure@      - app_name: jira-failure-exporter
 #jira-failure@        exporter_type: failure
 #jira-failure@        env_from_secrets:
