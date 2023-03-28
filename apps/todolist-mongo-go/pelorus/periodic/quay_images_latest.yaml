@@ -117,3 +117,13 @@ exporters:
 #@       value: github
 #@     - name: PROJECTS
 #@       value: konveyor/mig-demo-apps
+#pagerduty_failure@  - app_name: pagerduty-failure-exporter
+#pagerduty_failure@    exporter_type: failure
+#pagerduty_failure@    image_tag: latest
+#pagerduty_failure@    env_from_secrets:
+#pagerduty_failure@    - pagerduty-secret
+#pagerduty_failure@    extraEnv:
+#pagerduty_failure@    - name: LOG_LEVEL
+#pagerduty_failure@      value: DEBUG
+#pagerduty_failure@    - name: PROVIDER
+#pagerduty_failure@      value: pagerduty

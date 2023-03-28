@@ -109,6 +109,17 @@ spec:
 #@            value: konveyor/mig-demo-apps
 #@        source_ref: master
 #@        source_url: https://github.com/dora-metrics/pelorus.git
+#pagerduty_failure@      - app_name: pagerduty-failure-exporter
+#pagerduty_failure@        exporter_type: failure
+#pagerduty_failure@        env_from_secrets:
+#pagerduty_failure@          - pagerduty-secret
+#pagerduty_failure@        extraEnv:
+#pagerduty_failure@          - name: LOG_LEVEL
+#pagerduty_failure@            value: DEBUG
+#pagerduty_failure@          - name: PROVIDER
+#pagerduty_failure@            value: pagerduty
+#pagerduty_failure@        source_ref: master
+#pagerduty_failure@        source_url: https://github.com/dora-metrics/pelorus.git
   extra_prometheus_hosts: null
   openshift_prometheus_basic_auth_pass: changeme
   openshift_prometheus_htpasswd_auth: internal:{SHA}+pvrmeQCmtWmYVOZ57uuITVghrM=
