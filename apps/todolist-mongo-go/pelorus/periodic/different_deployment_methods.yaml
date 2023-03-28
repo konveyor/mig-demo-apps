@@ -1,5 +1,5 @@
 # Config file for Pelorus project
-# https://github.com/konveyor/pelorus/
+# https://github.com/dora-metrics/pelorus/
 
 # Deploy only one exporter with multiple deployment methods.
 #
@@ -52,14 +52,14 @@ exporters:
 
   - app_name: git-custom-url-deploytime-exporter
     exporter_type: deploytime
-    source_url: https://github.com/konveyor/pelorus.git
+    source_url: https://github.com/dora-metrics/pelorus.git
     extraEnv:
     - name: NAMESPACES
       value: mongo-persistent
 
   - app_name: git-custom-url-committime-exporter
     exporter_type: committime
-    source_url: https://github.com/konveyor/pelorus.git
+    source_url: https://github.com/dora-metrics/pelorus.git
     extraEnv:
     - name: NAMESPACES
       value: mongo-persistent

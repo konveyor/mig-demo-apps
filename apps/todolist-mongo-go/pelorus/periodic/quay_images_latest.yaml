@@ -1,5 +1,5 @@
 # Config file for Pelorus project
-# https://github.com/konveyor/pelorus/
+# https://github.com/dora-metrics/pelorus/
 
 # Deployment based on the Pelorus quay.io images
 # with the :latest flag, which are built after
