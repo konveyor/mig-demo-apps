@@ -77,6 +77,18 @@ exporters:
 #gitea-committime@      value: gitea
 #gitea-committime@    - name: NAMESPACES
 #gitea-committime@      value: gitea-binary
+#azure-devops-committime@  - app_name: azure-devops-committime-exporter
+#azure-devops-committime@    exporter_type: committime
+#azure-devops-committime@    image_tag: latest
+#azure-devops-committime@    env_from_secrets:
+#azure-devops-committime@    - azure-devops-secret
+#azure-devops-committime@    extraEnv:
+#azure-devops-committime@    - name: LOG_LEVEL
+#azure-devops-committime@      value: DEBUG
+#azure-devops-committime@    - name: GIT_PROVIDER
+#azure-devops-committime@      value: azure-devops
+#azure-devops-committime@    - name: NAMESPACES
+#azure-devops-committime@      value: azure-devops-binary
 #jira-failure@  - app_name: jira-failure-exporter
 #jira-failure@    exporter_type: failure
 #jira-failure@    image_tag: latest
