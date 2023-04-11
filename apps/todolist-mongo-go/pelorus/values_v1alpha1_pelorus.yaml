@@ -133,6 +133,19 @@ spec:
 #pagerduty_failure@            value: pagerduty
 #pagerduty_failure@        source_ref: master
 #pagerduty_failure@        source_url: https://github.com/dora-metrics/pelorus.git
+#azure-devops_failure@      - app_name: azure-devops-failure-exporter
+#azure-devops_failure@        exporter_type: failure
+#azure-devops_failure@        env_from_secrets:
+#azure-devops_failure@          - azure-devops-secret
+#azure-devops_failure@        extraEnv:
+#azure-devops_failure@          - name: LOG_LEVEL
+#azure-devops_failure@            value: DEBUG
+#azure-devops_failure@          - name: PROVIDER
+#azure-devops_failure@            value: azure-devops
+#azure-devops_failure@          - name: SERVER
+#azure-devops_failure@            value: dev.azure.com/matews1943
+#azure-devops_failure@        source_ref: master
+#azure-devops_failure@        source_url: https://github.com/dora-metrics/pelorus.git
   extra_prometheus_hosts: null
   openshift_prometheus_basic_auth_pass: changeme
   openshift_prometheus_htpasswd_auth: internal:{SHA}+pvrmeQCmtWmYVOZ57uuITVghrM=
