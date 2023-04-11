@@ -139,3 +139,15 @@ exporters:
 #pagerduty_failure@      value: DEBUG
 #pagerduty_failure@    - name: PROVIDER
 #pagerduty_failure@      value: pagerduty
+#azure-devops_failure@  - app_name: azure-devops-failure-exporter
+#azure-devops_failure@    exporter_type: failure
+#azure-devops_failure@    image_tag: latest
+#azure-devops_failure@    env_from_secrets:
+#azure-devops_failure@    - azure-devops-secret
+#azure-devops_failure@    extraEnv:
+#azure-devops_failure@    - name: LOG_LEVEL
+#azure-devops_failure@      value: DEBUG
+#azure-devops_failure@    - name: PROVIDER
+#azure-devops_failure@      value: azure-devops
+#azure-devops_failure@    - name: SERVER
+#azure-devops_failure@      value: dev.azure.com/matews1943
