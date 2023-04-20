@@ -163,3 +163,19 @@ exporters:
 #azure-devops_failure@      value: dev.azure.com/matews1943
 #azure-devops_failure@    source_ref: master
 #azure-devops_failure@    source_url: https://github.com/dora-metrics/pelorus.git
+#webhook_with_secret@  - app_name: webhook-secret-exporter
+#webhook_with_secret@    exporter_type: webhook
+#webhook_with_secret@    extraEnv:
+#webhook_with_secret@      - name: LOG_LEVEL
+#webhook_with_secret@        value: DEBUG
+#webhook_with_secret@      - name: SECRET_TOKEN
+#webhook_with_secret@        value: MySecretToken
+#webhook_with_secret@    source_ref: master
+#webhook_with_secret@    source_url: https://github.com/dora-metrics/pelorus.git
+#webhook@  - app_name: webhook-exporter
+#webhook@    exporter_type: webhook
+#webhook@    extraEnv:
+#webhook@      - name: LOG_LEVEL
+#webhook@        value: DEBUG
+#webhook@    source_ref: master
+#webhook@    source_url: https://github.com/dora-metrics/pelorus.git
