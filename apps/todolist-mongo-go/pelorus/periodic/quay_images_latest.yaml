@@ -151,3 +151,15 @@ exporters:
 #azure-devops_failure@      value: azure-devops
 #azure-devops_failure@    - name: SERVER
 #azure-devops_failure@      value: dev.azure.com/matews1943
+#webhook_with_secret@  - app_name: webhook-secret-exporter
+#webhook_with_secret@    exporter_type: webhook
+#webhook_with_secret@    extraEnv:
+#webhook_with_secret@      - name: LOG_LEVEL
+#webhook_with_secret@        value: DEBUG
+#webhook_with_secret@      - name: SECRET_TOKEN
+#webhook_with_secret@        value: MySecretToken
+#webhook@  - app_name: webhook-exporter
+#webhook@    exporter_type: webhook
+#webhook@    extraEnv:
+#webhook@      - name: LOG_LEVEL
+#webhook@        value: DEBUG
