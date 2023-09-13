@@ -1,6 +1,6 @@
 ---
 kind: DeploymentConfig
-apiVersion: v1
+apiVersion: apps.openshift.io/v1
 metadata:
   name: restify
   namespace: parks-app
@@ -25,7 +25,7 @@ spec:
     deploymentconfig: restify
   template:
     metadata:
-      creationTimestamp: 
+      creationTimestamp:
       labels:
         app: restify
         deploymentconfig: restify

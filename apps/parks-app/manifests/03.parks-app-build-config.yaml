@@ -1,6 +1,6 @@
 ---
 kind: BuildConfig
-apiVersion: v1
+apiVersion: build.openshift.io/v1
 metadata:
   name: restify
   namespace: parks-app
@@ -35,4 +35,3 @@ spec:
   resources: {}
 status:
   lastVersion: 0
-
