@@ -1,12 +1,12 @@
 ---
-apiVersion: v1
 kind: ProjectRequest
+apiVersion: project.openshift.io/v1
 metadata:
   name: parks-app
 
 ---
 kind: ImageStream
-apiVersion: v1
+apiVersion: image.openshift.io/v1
 metadata:
   name: restify
   namespace: parks-app
@@ -18,7 +18,7 @@ status:
 
 ---
 kind: BuildConfig
-apiVersion: v1
+apiVersion: build.openshift.io/v1
 metadata:
   name: restify
   namespace: parks-app
@@ -44,9 +44,8 @@ spec:
     type: Source
     sourceStrategy:
       from:
-        kind: ImageStreamTag
-        namespace: openshift
-        name: nodejs:0.10
+        kind: DockerImage
+        name: 'registry.redhat.io/ubi8/nodejs-10:latest'
   output:
     to:
       kind: ImageStreamTag
@@ -55,10 +54,9 @@ spec:
 status:
   lastVersion: 0
 
-
 ---
 kind: DeploymentConfig
-apiVersion: v1
+apiVersion: apps.openshift.io/v1
 metadata:
   name: restify
   namespace: parks-app
@@ -83,7 +81,7 @@ spec:
     deploymentconfig: restify
   template:
     metadata:
-      creationTimestamp: 
+      creationTimestamp:
       labels:
         app: restify
         deploymentconfig: restify
@@ -114,7 +112,7 @@ status: {}
 
 ---
 kind: Route
-apiVersion: v1
+apiVersion: route.openshift.io/v1
 metadata:
   name: restify
   namespace: parks-app
@@ -150,7 +148,7 @@ status:
 
 ---
 kind: DeploymentConfig
-apiVersion: v1
+apiVersion: apps.openshift.io/v1
 metadata:
   name: mongodb
   namespace: parks-app
@@ -158,15 +156,6 @@ spec:
   strategy:
     type: Recreate
   triggers:
-  - type: ImageChange
-    imageChangeParams:
-      automatic: true
-      containerNames:
-      - mongodb-container
-      from:
-        kind: ImageStreamTag
-        name: mongodb:latest
-        namespace: openshift
   - type: ConfigChange
   replicas: 1
   selector:
@@ -178,7 +167,7 @@ spec:
     spec:
       containers:
       - name: mongodb-container
-        image: " "
+        image: 'registry.redhat.io/rhscl/mongodb-36-rhel7:latest'
         ports:
         - containerPort: 27017
           protocol: TCP
@@ -222,8 +211,8 @@ status:
   loadBalancer: {}
 
 ---
-apiVersion: v1
 kind: PersistentVolumeClaim
+apiVersion: v1
 metadata:
   name: "mongodb-data-claim"
   namespace: parks-app
@@ -233,4 +222,3 @@ spec:
   resources:
     requests:
       storage: 10Gi
-

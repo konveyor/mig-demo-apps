@@ -1,6 +1,6 @@
 ---
 kind: DeploymentConfig
-apiVersion: v1
+apiVersion: apps.openshift.io/v1
 metadata:
   name: mongodb
   namespace: parks-app
@@ -8,15 +8,6 @@ spec:
   strategy:
     type: Recreate
   triggers:
-  - type: ImageChange
-    imageChangeParams:
-      automatic: true
-      containerNames:
-      - mongodb-container
-      from:
-        kind: ImageStreamTag
-        name: mongodb:latest
-        namespace: openshift
   - type: ConfigChange
   replicas: 1
   selector:
@@ -28,7 +19,7 @@ spec:
     spec:
       containers:
       - name: mongodb-container
-        image: " "
+        image: 'registry.redhat.io/rhscl/mongodb-36-rhel7:latest'
         ports:
         - containerPort: 27017
           protocol: TCP
