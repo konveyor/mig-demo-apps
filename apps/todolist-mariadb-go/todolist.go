@@ -43,13 +43,10 @@ import (
 
 var db *gorm.DB
 
+// wrapper for db connection
 func connectToDB() {
-	remote, err := connectToMariaDBRemote()
-	if err != nil {
-		local, _ := connectToMariaDBLocal()
-		db = local
-	} else {
-		db = remote
+	if db, _ = connectToMariaDBRemote(); db == nil {
+		db, _ = connectToMariaDBLocal()
 	}
 }
 
@@ -59,7 +56,7 @@ func connectToMariaDBLocal() (*gorm.DB, error) {
 	dsn := "test:test@tcp(127.0.0.1:3306)/todolist?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Error("Connection failed")
+		log.Errorf("Connection failed: %v", err)
 		return nil, err
 	}
 
@@ -73,7 +70,7 @@ func connectToMariaDBRemote() (*gorm.DB, error) {
 	dsn := "changeme:changeme@tcp(mysql:3306)/todolist?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Error("Connection failed")
+		log.Errorf("Connection failed: %v", err)
 		return nil, err
 	}
 

@@ -2,13 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-from datetime import datetime
 import json
 import requests
 
+from datetime import datetime
+from typing import Dict
+from urllib.parse import urljoin
 
 
-def updateToDo(base_url, id, completed):
+def updateToDo(base_url, id, completed) -> bool:
   """Update data to the todo application
 
   Args:
@@ -33,11 +35,12 @@ def updateToDo(base_url, id, completed):
       print("Task updated successfully!")
       return True
   else:
-      print("Error updating task.")
+      print(f"Response status code: {response.status_code}")
+      print(f"Response text: {response.text}")
       return False
   
 
-def createToDo(base_url, description, completed):
+def createToDo(base_url, description, completed) -> Dict:
   """Post data to the todo application
 
   Args:
@@ -54,18 +57,19 @@ def createToDo(base_url, description, completed):
   }
 
   # Set the endpoint URL
-  endpoint = base_url + "/todo"
+  endpoint = urljoin(base_url, "/todo")
   # Send a POST request with the data and the endpoint URL
   response = requests.post(endpoint, data=data)
   # Check the status code of the response
   if response.status_code == 201 or response.status_code == 200:
       print("Task created successfully!")
   else:
-      print("Error creating task.")
+      print(f"Response status code: {response.status_code}")
+      print(f"Response text: {response.text}")
   response_dict = json.loads(response.text)[0]
   return response_dict
 
-def checkToDoLists(base_url, completed):
+def checkToDoLists(base_url, completed) -> list:
   """Post data to the todo application
 
   Args:
@@ -77,20 +81,21 @@ def checkToDoLists(base_url, completed):
   """
   # Set the endpoint URL
   if completed:
-    endpoint = base_url + "/todo-completed"
+    endpoint = urljoin(base_url, "/todo-completed")
   else:
-    endpoint = base_url + "/todo-incomplete"
+    endpoint = urljoin(base_url, "/todo-incomplete")
   # Send a POST request with the data and the endpoint URL
   response = requests.get(endpoint)
   # Check the status code of the response
   if response.status_code == 201 or response.status_code == 200:
       print("Got list of items")
   else:
-      print("Failed to get list of items")
+      print(f"Response status code: {response.status_code}")
+      print(f"Response text: {response.text}")
   response_dict = json.loads(response.text)
   return response_dict
 
-def checkAppLog(base_url):
+def checkAppLog(base_url) -> bool:
   """Get log data from the todo application
   Args:
     base_url: url
@@ -99,7 +104,7 @@ def checkAppLog(base_url):
     bool 
   """
   log = False
-  endpoint = base_url + "/log"
+  endpoint = urljoin(base_url, "/log")
 
   # Send a POST request with the data and the endpoint URL
   response = requests.get(endpoint)
@@ -108,11 +113,12 @@ def checkAppLog(base_url):
       print("Got the log")
       log = True
   else:
-      print("Failed to get the app log")
+      print(f"Response status code: {response.status_code}")
+      print(f"Response text: {response.text}")
       log = False
   return log
 
-def deleteToDoItems(base_url,item):
+def deleteToDoItems(base_url,item) -> bool:
   """Post data to the todo application
 
   Args:
@@ -123,7 +129,7 @@ def deleteToDoItems(base_url,item):
     bool
   """
 
-  endpoint = base_url + "/todo/" + str(item["Id"])
+  endpoint = urljoin(base_url, "/todo/" + str(item["Id"]))
   # Send a POST request with the data and the endpoint URL
   response = requests.delete(endpoint)
   # Check the status code of the response
@@ -132,6 +138,8 @@ def deleteToDoItems(base_url,item):
       return True
   else:
       print("Failed to delete item " + str(item["Id"]))
+      print(f"Response status code: {response.status_code}")
+      print(f"Response text: {response.text}")
       return False
 
 
@@ -209,11 +217,11 @@ def main():
    else:
       print("SUCCESS!")
 
-   # Test the app log
+   # Test the app log, if two-volume-csi is used
    if checkAppLog(base_url):
      print("LOG FOUND: SUCCESS!")
    else:
-     print("FAILED!")
+     print("FAILED! only valid for two volume testing")
    
 
 

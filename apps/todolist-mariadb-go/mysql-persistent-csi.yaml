@@ -127,7 +127,6 @@ items:
               timeoutSeconds: 2
               successThreshold: 1
               failureThreshold: 40 # 40x30sec before restart pod
-            restartPolicy: Always
           - image: docker.io/curlimages/curl:8.5.0
             name: curl-tool
             command: ["/bin/sleep", "infinity"]
@@ -177,7 +176,7 @@ items:
         spec:
           containers:
           - name: todolist
-            image:  quay.io/rhn_engineering_whayutin/todolist-mariadb-go-2:latest
+            image: quay.io/migtools/oadp-ci-todolist-mariadb-go:latest
             env:
               - name: foo
                 value: bar

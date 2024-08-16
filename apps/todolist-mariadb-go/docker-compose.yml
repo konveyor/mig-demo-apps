@@ -15,7 +15,7 @@ services:
     networks:
       - mysql
   todolist:
-    image: quay.io/konveyor/todolist-mariadb-go:v2_4
+    image: quay.io/migtools/oadp-ci-todolist-mariadb-go
     restart: always
     ports:
       - 8000:8000
