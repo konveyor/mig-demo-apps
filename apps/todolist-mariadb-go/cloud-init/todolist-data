@@ -1,0 +1,43 @@
+#cloud-config
+ssh_pwauth: true
+# root:dog8code
+# test:test
+users:
+  - name: root
+    ssh_authorized_keys:
+    - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPIXu6mcNuozbbovc7PLAQAgJFC3VcV4B9Z/mc089Ofv whayutin@redhat.com
+    passwd: $y$j9T$iSETCETO7bakGUYySJ4V3/$YiBzqWB87OHVT7.KbK5cgNWP76TtvuwB4YU/fey7IPB
+  - name:  test
+    groups: users,wheel
+    passwd: $y$j9T$.aun22erXpIw.Chf9IAhz0$i02ipoROmEQjH/OkvqBYNoTIL3gY6quhDzN/4cdNksA
+    ssh_authorized_keys:
+    - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPIXu6mcNuozbbovc7PLAQAgJFC3VcV4B9Z/mc089Ofv whayutin@redhat.com
+ 
+packages:
+  - mariadb-server
+  - net-tools
+  - python-requests
+  - vim
+  - wget
+  - unzip
+
+runcmd:
+  - systemctl stop firewalld
+  - systemctl disable firewalld
+  - systemctl start mariadb
+  - systemctl enable mariadb
+  - mysql -uroot -e "CREATE DATABASE todolist; USE todolist; CREATE USER 'test'@'localhost' IDENTIFIED BY 'test';"
+  - mysql -uroot -e "grant all privileges on todolist.* to test@'localhost' identified by 'test'; FLUSH PRIVILEGES;"
+  - pushd /home/test/
+  - wget https://github.com/weshayutin/todolist-mariadb-go/releases/download/testing1/todolist-linux-amd64.zip
+  - unzip todolist-linux-amd64.zip
+  - chown -R test:test /home/test
+  - semanage fcontext --add --type bin_t '/home/test/todolist-linux-amd64'
+  - restorecon -Fv /home/test/todolist-linux-amd64
+  - cp systemd/todolist-mariadb.service /etc/systemd/system
+  - popd
+  - systemctl --user daemon-reload
+  - systemctl start todolist-mariadb.service
+  - systemctl enable todolist-mariadb.service
+  - systemctl status todolist-mariadb.service
+  - systemctl  disable  cloud-init

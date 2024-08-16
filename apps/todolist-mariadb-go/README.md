@@ -4,42 +4,32 @@
 https://github.com/sdil/learning/blob/master/go/todolist-mysql-go/todolist.go
 
 
-## Local Setup ( Easy )
-
-The right OS:
-```
-sudo dnf install podman-compose
-podman-compose up -d
-```
-
-The wrong OS:
-```
-brew install podman-compose
-podman-compose up -d
-```
-
-
-## Local Setup ( Harder )
+## Local Setup
 
 * Get mariadb running
 
 ```
 docker/podman run -d -p 3306:3306 --name mariadb -e MYSQL_ROOT_PASSWORD=root mariadb
 docker/podman exec -it mariadb mariadb -uroot -proot -e 'CREATE DATABASE todolist'
+podman exec -it mariadb mariadb -uroot -proot -e "CREATE USER 'test'@'%' IDENTIFIED BY 'test';"
+podman exec -it mariadb mariadb -uroot -proot -e "GRANT ALL PRIVILEGES ON todolist.* TO 'test';" 
 
 ```
+### Note: Mariadb password settings:
+* localhost
+```
+dsn := "test:test@tcp(127.0.0.1:3306)/todolist?charset=utf8mb4&parseTime=True&loc=Local"
+```
+* As deployed on OpenShift with templates
+```
+dsn := "changeme:changeme@tcp(mysql:3306)/todolist?charset=utf8mb4&parseTime=True&loc=Local"
+```
+
 
 * Get the app running
 
 ```
 go mod tidy
-```
-* Update the db for a local connection:
-HERE: https://github.com/weshayutin/todolist-mariadb-go/blob/main/todolist.go#L44
-
-```
-var db, _ = gorm.Open("mysql", "root:root@tcp/todolist?charset=utf8&parseTime=True")
-
 ```
 
 Execute:
@@ -47,8 +37,9 @@ Execute:
 go run todolist.go
 ```
 
-Initial Page should have two entries, one complete and one incomplete.
-
+Navigate your browser to:
+ * http://localhost:8000
+ * http://fqdn
 
 Show items in the db:
 ```
@@ -94,6 +85,63 @@ MariaDB [todolist]>
 
 ![gnome-shell-screenshot-edww3e](https://user-images.githubusercontent.com/138787/160934609-a77798a1-3986-46a0-a334-a8b53ceccb7d.png)
 
+## Deploy to OpenShift
+```
+oc create -f mysql-persistent-template.yaml
+OR
+oc create -f mysql-persistent-csi-template.yaml -f pvc/$cloud.yaml 
+```
 
-### New Features:
-* There is a new api endpoint to to display the log file, not the stdout.  This will help to confirm the volume attached to the todolist container is restored properly.
+## testing
+There are some basic curl and python tests in the tests directory where you can
+see the api is exercised and the database is populated.
+```
+cd tests
+python test.py
+```
+
+## building
+Build for release:
+```
+./build.sh
+```
+
+Build a new container:
+Here's a quick example
+```
+podman build  -t quay.io/rhn_engineering_whayutin/todolist-mariadb-go-2 .
+podman push
+```
+
+## build for multi-arch
+https://developers.redhat.com/articles/2023/11/03/how-build-multi-architecture-container-images#benefits_of_multi_architecture_containers
+
+## Build a VM w/ the todolist installed directly on the VM w/o containers
+* Note: this was tested with Fedora 39
+    * Fedora-Cloud-Base-39-1.5.x86_64.qcow2
+
+* get a RHEL, CentOS, or Fedora VM image.
+ * copy the qcow2 to /var/lib/libvirt/images
+ * update the cloud-init/todolist-data file with your public ssh keys
+ ```
+ ssh-authorized-keys:
+    - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPIXu6mcNuozbbovc7PLAQAgJFC3VcV4B9Z/mc089Ofv whayutin@redhat.com
+ ```
+ * copy the cloud-init/todolist-data to /var/lib/libvirt/boot/cloud-init/
+
+* sample virt-install
+```
+clear; sudo virt-install --name todolist-mariadb-1  --memory memory=3072  --cpu host --vcpus 2  --graphics none  --os-variant fedora39  --import  --disk /var/lib/libvirt/images/Fedora-Cloud-Base-39-1.5.x86_64.qcow2,format=qcow2,bus=virtio  --disk size=8 --network type=network,source=default,model=virtio  --cloud-init user-data=/var/lib/libvirt/boot/cloud-init/todolist-data
+```
+
+* wait for both the install and cloud-init to finish.
+* browse to the vm ip and port: `http://192.168.122.113:8000/` for example
+
+
+* If the cloud-init fails, test w/
+```
+sudo cloud-init schema --system
+```
+
+## updates
+* Note that the app will NO longer create two items in the the todo list at start up. 
