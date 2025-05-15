@@ -141,12 +141,12 @@ items:
       source:
         type: Git
         git:
-          uri: https://github.com/weshayutin/mig-demo-apps.git
+          uri: https://github.com/weshayutin/todolist-mongo-go.git
           ref: master
       strategy:
         type: Docker
         dockerStrategy:
-          dockerfilePath: apps/todolist-mongo-go/Dockerfile
+          dockerfilePath: Dockerfile
       output:
         to:
           kind: ImageStreamTag

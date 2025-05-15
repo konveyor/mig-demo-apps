@@ -24,3 +24,14 @@ services:
       ME_CONFIG_MONGODB_ADMINUSERNAME: changeme
       ME_CONFIG_MONGODB_ADMINPASSWORD: changeme
       ME_CONFIG_MONGODB_URL: mongodb://changeme:changeme@mongo:27017/
+
+  todolist:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: localhost/todolist:latest
+    restart: always
+    ports:
+      - 8000:8000
+    environment:
+      clientOptions: mongodb://changeme:changeme@mongo:27017/todolist

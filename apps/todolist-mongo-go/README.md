@@ -36,19 +36,6 @@ Show items in the db:  http://localhost:8081/db/todolist/
 
 ![gnome-shell-screenshot-6ycmy9](https://user-images.githubusercontent.com/138787/164760586-72b7b0b9-47f1-4510-8308-b363f10ca8a6.png)
 
-## Using the manifest to deploy
-
-* Note the defined git url in template needs to be updated to use your personal fork.
-
-```
-cd mig-demo-apps/apps/todolist-mongo-go
-sed -i 's/your_org/YOUR_REAL_GITHUB_FORK_ORG/g' mongo-persistent.yaml
-oc create -f mongo-persistent.yaml
-```
-
-
 ## Notes:
 * https://redhat-scholars.github.io/openshift-starter-guides/rhs-openshift-starter-guides/4.7/nationalparks-java-codechanges-github.html#webhooks_with_openshift
 *
-
-* test webhook5
