@@ -1,6 +1,5 @@
 FQDN=localhost
 PORT=8000
-#FQDN=todolist-route-mysql-persistent.apps.wdharm41607261.migration.redhat.com
 #PORT=80
 export date=`date "+%F-%T"`
 curl -d "description=curl_todo_1_$date&completed=false" -X POST http://$FQDN:$PORT/todo

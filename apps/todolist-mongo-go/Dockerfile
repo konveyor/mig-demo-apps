@@ -1,5 +1,7 @@
-#FROM registry.access.redhat.com/ubi8/ubi-minimal
-FROM --platform=$BUILDPLATFORM golang:1.23-alpine AS build-env
+FROM --platform=$BUILDPLATFORM quay.io/konveyor/builder:ubi9-latest AS build-env
+ARG BUILDPLATFORM
+ARG TARGETARCH
+
 RUN mkdir /build
 WORKDIR /build
 COPY *.go .
