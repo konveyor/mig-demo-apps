@@ -14,20 +14,6 @@ items:
       namespace: mysql-persistent
       labels:
         component: mysql-persistent
-  - apiVersion: v1
-    kind: PersistentVolumeClaim
-    metadata:
-      name: mysql
-      namespace: mysql-persistent
-      labels:
-        app: mysql
-    spec:
-      accessModes:
-      - ReadWriteOnce
-      storageClassName: gp2-csi
-      resources:
-        requests:
-          storage: 1Gi
   - kind: SecurityContextConstraints
     apiVersion: security.openshift.io/v1
     metadata:
@@ -84,12 +70,21 @@ items:
           labels:
             e2e-app: "true"
             app: mysql
+            curl-tool: "true"
         spec:
+          securityContext:
+            runAsGroup: 27
+            runAsUser: 27
+            fsGroup: 27
+            privileged: true
           serviceAccountName: mysql-persistent-sa
           containers:
           - image: registry.redhat.io/rhel8/mariadb-105:latest
             name: mysql
             securityContext:
+              runAsGroup: 27
+              runAsUser: 27
+              fsGroup: 27
               privileged: true
             env:
               - name: MYSQL_USER
@@ -109,6 +104,32 @@ items:
             volumeMounts:
             - name: mysql-data
               mountPath: /var/lib/mysql
+            livenessProbe:
+              tcpSocket:
+                port: mysql
+              initialDelaySeconds: 30
+              periodSeconds: 10
+              timeoutSeconds: 5
+            startupProbe:
+              exec:
+                command:
+                - /usr/bin/timeout
+                - 1s
+                - /usr/bin/mysql
+                - $(MYSQL_DATABASE)
+                - -h
+                - 127.0.0.1
+                - -u$(MYSQL_USER)
+                - -p$(MYSQL_PASSWORD)
+                - -e EXIT
+              initialDelaySeconds: 5
+              periodSeconds: 30
+              timeoutSeconds: 2
+              successThreshold: 1
+              failureThreshold: 40 # 40x30sec before restart pod
+          - image: docker.io/curlimages/curl:8.5.0
+            name: curl-tool
+            command: ["/bin/sleep", "infinity"]
           volumes:
           - name: mysql-data
             persistentVolumeClaim:
@@ -121,6 +142,7 @@ items:
       labels:
         app: todolist
         service: todolist
+        e2e-app: "true"
     spec:
       ports:
         - name: web
@@ -137,6 +159,7 @@ items:
       labels:
         app: todolist
         service: todolist
+        e2e-app: "true"
     spec:
       replicas: 1
       selector:
@@ -149,10 +172,11 @@ items:
           labels:
             app: todolist
             service: todolist
+            e2e-app: "true"
         spec:
           containers:
           - name: todolist
-            image:  quay.io/mferrato/todolist-mariadb-go:v1
+            image: quay.io/migtools/oadp-ci-todolist-mariadb-go:latest
             env:
               - name: foo
                 value: bar
@@ -161,8 +185,8 @@ items:
                 protocol: TCP
           initContainers:
           - name: init-myservice
-            image: registry.access.redhat.com/ubi8/ubi:latest
-            command: ['sh', '-c', 'sleep 10; until getent hosts mysql; do echo waiting for mysql; sleep 5; done;']
+            image: docker.io/curlimages/curl:8.5.0
+            command: ['sh', '-c', 'sleep 10; until /usr/bin/nc -z -w 1 mysql 3306; do echo Trying to connect to mysql DB port; sleep 5; done; echo mysql DB port reachable']
   - apiVersion: route.openshift.io/v1
     kind: Route
     metadata:

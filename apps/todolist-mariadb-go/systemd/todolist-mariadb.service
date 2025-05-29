@@ -1,0 +1,19 @@
+# READ! This is a user daemon, start with:
+# systemctl start todolist-mariadb.service
+# systemctl status todolist-mariadb.service
+[Unit]
+Description=todolist-mariadb service
+After=mariadb.service
+
+[Service]
+#Type=oneshot
+WorkingDirectory=/home/test/
+#ExecStartPre=go mod tidy
+ExecStart=/home/test/todolist-linux-amd64
+#Restart=always
+PIDFile=/tmp/todolist_pid
+User=test
+Group=test
+
+[Install]
+WantedBy=multi-user.target

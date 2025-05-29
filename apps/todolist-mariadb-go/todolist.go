@@ -33,13 +33,49 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
-	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/rs/cors"
 	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
-var db, _ = gorm.Open("mysql", "changeme:changeme@(mysql:3306)/todolist?charset=utf8&parseTime=True")
+var db *gorm.DB
+
+// wrapper for db connection
+func connectToDB() {
+	if db, _ = connectToMariaDBRemote(); db == nil {
+		db, _ = connectToMariaDBLocal()
+	}
+}
+
+// connect to mariadb at 127.0.0.1
+func connectToMariaDBLocal() (*gorm.DB, error) {
+	log.Info("Attempting to connect to: test:test@tcp(127.0.0.1:3306)/todolist")
+	dsn := "test:test@tcp(127.0.0.1:3306)/todolist?charset=utf8mb4&parseTime=True&loc=Local"
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		log.Errorf("Connection failed: %v", err)
+		return nil, err
+	}
+
+	return db, nil
+}
+
+// connect to mariadb at mysql address defined in docker
+func connectToMariaDBRemote() (*gorm.DB, error) {
+	log.Info("Attempting to connect to: changeme:changeme@tcp(mysql:3306)/todolist")
+	// the user and passwd defined here match the templates in mysql-persistent.yaml.  Change as needed
+	dsn := "changeme:changeme@tcp(mysql:3306)/todolist?charset=utf8mb4&parseTime=True&loc=Local"
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		log.Errorf("Connection failed: %v", err)
+		return nil, err
+	}
+
+	return db, nil
+}
 
 type TodoItemModel struct {
 	Id          int `gorm:"primary_key"`
@@ -49,27 +85,33 @@ type TodoItemModel struct {
 
 func CreateItem(w http.ResponseWriter, r *http.Request) {
 	description := r.FormValue("description")
-	logrus.WithFields(logrus.Fields{"description": description}).Info("Add new TodoItem. Saving to database.")
+	log.WithFields(log.Fields{"description": description}).Info("Add new TodoItem. Saving to database.")
 	todo := &TodoItemModel{Description: description, Completed: false}
 	db.Create(&todo)
-	result := db.Last(&todo).Value
+	//result := db.Last(&todo).Value
+	//ModelTodo := &TodoItemModel{}
+	var ModelTodo []TodoItemModel
+	db.Debug().Last(&ModelTodo).Scan(&ModelTodo)
+	//log.Info(result.Statement.Dest)
+	log.Info("New Id of row: ", ModelTodo[0].Id)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(result)
+	json.NewEncoder(w).Encode(&ModelTodo)
 }
 
 func UpdateItem(w http.ResponseWriter, r *http.Request) {
 	// Get URL parameter from mux
 	vars := mux.Vars(r)
 	id, _ := strconv.Atoi(vars["id"])
+	log.Info("ID of item update from HTTP Request, ID:", id)
 
 	// Test if the TodoItem exist in DB
 	err := GetItemByID(id)
-	if err == false {
+	if err == false || id == 0 {
 		w.Header().Set("Content-Type", "application/json")
 		io.WriteString(w, `{"updated": false, "error": "Record Not Found"}`)
 	} else {
 		completed, _ := strconv.ParseBool(r.FormValue("completed"))
-		logrus.WithFields(logrus.Fields{"Id": id, "Completed": completed}).Info("Updating TodoItem")
+		log.WithFields(log.Fields{"Id": id, "Completed": completed}).Info("Updating TodoItem")
 		todo := &TodoItemModel{}
 		db.First(&todo, id)
 		todo.Completed = completed
@@ -90,7 +132,7 @@ func DeleteItem(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		io.WriteString(w, `{"deleted": false, "error": "Record Not Found"}`)
 	} else {
-		logrus.WithFields(logrus.Fields{"Id": id}).Info("Deleting TodoItem")
+		log.WithFields(log.Fields{"Id": id}).Info("Deleting TodoItem")
 		todo := &TodoItemModel{}
 		db.First(&todo, id)
 		db.Delete(&todo)
@@ -100,24 +142,25 @@ func DeleteItem(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetItemByID(Id int) bool {
-	todo := &TodoItemModel{}
-	result := db.First(&todo, Id)
+	//todo := &TodoItemModel{}
+	var todo []TodoItemModel
+	result := db.Debug().First(&todo, Id)
 	if result.Error != nil {
-		logrus.Warn("TodoItem not found in database")
+		log.Error("TodoItem not found in database")
 		return false
 	}
 	return true
 }
 
 func GetCompletedItems(w http.ResponseWriter, r *http.Request) {
-	logrus.Info("Get completed TodoItems")
+	log.Info("Get completed TodoItems")
 	completedTodoItems := GetTodoItems(true)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(completedTodoItems)
 }
 
 func GetIncompleteItems(w http.ResponseWriter, r *http.Request) {
-	logrus.Info("Get Incomplete TodoItems")
+	log.Info("Get Incomplete TodoItems")
 	IncompleteTodoItems := GetTodoItems(false)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(IncompleteTodoItems)
@@ -125,18 +168,21 @@ func GetIncompleteItems(w http.ResponseWriter, r *http.Request) {
 
 func GetTodoItems(completed bool) interface{} {
 	var todos []TodoItemModel
-	TodoItems := db.Where("completed = ?", completed).Find(&todos).Value
-	return TodoItems
+	//var print_results []map[string]interface{}
+	db.Debug().Where("completed = ?", completed).Find(&todos).Scan(&todos)
+	//DebugTodoItems := db.Raw("SELECT * FROM `todo_item_models` WHERE completed = false").Scan(&todos)
+	log.Info(&todos)
+	return &todos
 }
 
 func Healthz(w http.ResponseWriter, r *http.Request) {
-	logrus.Info("API Health is OK")
+	log.Info("API Health is OK")
 	w.Header().Set("Content-Type", "application/json")
 	io.WriteString(w, `{"alive": true}`)
 }
 
 func Home(w http.ResponseWriter, r *http.Request) {
-	logrus.Info("Get index.html")
+	log.Info("Get index.html")
 	p := path.Dir("index.html")
 	// set header
 	w.Header().Set("Content-type", "text/html")
@@ -144,12 +190,12 @@ func Home(w http.ResponseWriter, r *http.Request) {
 }
 
 func init() {
-	logrus.SetFormatter(&logrus.TextFormatter{})
-	logrus.SetReportCaller(true)
+	log.SetFormatter(&log.TextFormatter{})
+	log.SetReportCaller(true)
 }
 
 func prepopulate() {
-	logrus.Info("Prepopulate the db")
+	log.Info("Prepopulate the db")
 	db.Create(&TodoItemModel{Description: "time to make the donuts"})
 	db.Create(&TodoItemModel{Description: "prepopulate the db", Completed: true})
 
@@ -159,6 +205,10 @@ func GetLogFile(w http.ResponseWriter, r *http.Request) {
 	// if file not found we simply get a 404
 	filename := "/tmp/log/todoapp/app.log"
 	http.ServeFile(w, r, filename)
+}
+
+func faviconHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "favicon.ico")
 }
 
 func main() {
@@ -179,20 +229,14 @@ func main() {
 		logrus.Info("Success: Attached volume and redirected logs to /tmp/log/todoapp/app.log")
 	}
 
-	defer db.Close()
-	previousDb := db.Take(&TodoItemModel{})
-	if previousDb.Error != nil {
-		logrus.Info("A running instance of the db: todolist not found, creating")
-		db.Debug().DropTableIfExists(&TodoItemModel{})
-		db.Debug().AutoMigrate(&TodoItemModel{})
-		prepopulate()
-	}
-
+	connectToDB()
+	db.Migrator().CreateTable(&TodoItemModel{})
 	fs := http.FileServer(http.Dir("./resources/"))
 
-	logrus.Info("Starting Todolist API server")
+	log.Info("Starting Todolist API server")
 	router := mux.NewRouter()
 	router.PathPrefix("/resources/").Handler(http.StripPrefix("/resources/", fs))
+	router.HandleFunc("/favicon.ico", faviconHandler)
 	router.HandleFunc("/", Home).Methods("GET")
 	router.HandleFunc("/healthz", Healthz).Methods("GET")
 	router.HandleFunc("/log", GetLogFile).Methods("GET")

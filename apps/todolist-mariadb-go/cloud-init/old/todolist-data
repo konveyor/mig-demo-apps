@@ -1,0 +1,56 @@
+instance-id: todolist-mariadb-app-1
+# cloud-config
+# (1) setting hostname
+preserve_hostname: False
+hostname: todolist-mariadb-app-1
+#fqdn: web.example.com
+
+# (2) set up root and fallback account including rsa key copied into this file
+users:
+    - name: root
+      ssh-authorized-keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPIXu6mcNuozbbovc7PLAQAgJFC3VcV4B9Z/mc089Ofv whayutin@redhat.com
+    - name:  test
+      groups: users,wheel 
+      ssh_pwauth: True 
+      ssh-authorized-keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPIXu6mcNuozbbovc7PLAQAgJFC3VcV4B9Z/mc089Ofv whayutin@redhat.com
+ 
+# (3) set up a first-time password for both accounts
+chpasswd:
+  list: |
+    root:dog8code
+    test:test
+  expire: False
+
+# (4) install additional required packages
+packages:
+  - firewalld
+  - golang
+  - git
+  - mariadb-server
+  - net-tools
+  - python-requests
+  - vim
+
+# (6) perform a package upgrade
+package_upgrade: true 
+
+# (7) several configuration commands are executed on first boot
+runcmd:
+  - systemctl stop firewalld
+  - systemctl disable firewalld
+  - systemctl start mariadb
+  - systemctl enable mariadb
+  - mysql -uroot -e "CREATE DATABASE todolist; USE todolist; CREATE USER 'test'@'localhost' IDENTIFIED BY 'test';"
+  - mysql -uroot -e "grant all privileges on todolist.* to test@'localhost' identified by 'test'; FLUSH PRIVILEGES;"
+  - pushd /home/test/
+  - git clone https://github.com/weshayutin/todolist-mariadb-go.git
+  - popd
+  - pushd /home/test/todolist-mariadb-go 
+  - cp systemd/todolist-mariadb.service /etc/systemd/user
+  - systemctl --user daemon-reload
+  - systemctl --user start todolist-mariadb.service
+  - systemctl --user enable todolist-mariadb.service
+  - systemctl  disable  cloud-init
+# done
