@@ -26,9 +26,18 @@ Execute:
 go run todolist.go
 ```
 
-Initial Page should have two entries, one complete and one incomplete.
+Build:
+build multi-arch images w/ build.sh
+
+Test:
+see the test directory
+
+OpenShift Templates:
+See: https://github.com/openshift/oadp-operator/tree/master/tests/e2e/sample-applications/mongo-persistent
 
 
+
+DB:
 Show items in the db:  http://localhost:8081/db/todolist/
 
 ![gnome-shell-screenshot-83uili](https://user-images.githubusercontent.com/138787/164760526-0585899c-b5f8-41a2-91c8-ea78e740e670.png)
@@ -36,19 +45,6 @@ Show items in the db:  http://localhost:8081/db/todolist/
 
 ![gnome-shell-screenshot-6ycmy9](https://user-images.githubusercontent.com/138787/164760586-72b7b0b9-47f1-4510-8308-b363f10ca8a6.png)
 
-## Using the manifest to deploy
-
-* Note the defined git url in template needs to be updated to use your personal fork.
-
-```
-cd mig-demo-apps/apps/todolist-mongo-go
-sed -i 's/your_org/YOUR_REAL_GITHUB_FORK_ORG/g' mongo-persistent.yaml
-oc create -f mongo-persistent.yaml
-```
-
-
 ## Notes:
 * https://redhat-scholars.github.io/openshift-starter-guides/rhs-openshift-starter-guides/4.7/nationalparks-java-codechanges-github.html#webhooks_with_openshift
 *
-
-* test webhook5
